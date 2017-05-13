@@ -21,26 +21,25 @@
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
+\setcounter{page}{1}
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{\LaTeX\ Author Guidelines for CVPR Proceedings}
+\title{Self-driving Car Steering Angle Prediction based on Image Recognition}
 
-\author{First Author\\
-Institution1\\
-Institution1 address\\
-{\tt\small firstauthor@i1.org}
+\author{Shuyang Du\\
+{\tt\small shuyangd@stanford.edu}
 % For a paper whose authors are all at the same institution,
 % omit the following lines up until the closing ``}''.
 % Additional authors and addresses can be added with ``\and'',
 % just like the second author.
 % To save space, use either the email address or home page, not both
 \and
-Second Author\\
-Institution2\\
-First line of institution2 address\\
-{\tt\small secondauthor@i2.org}
+Haoli Gui\\
+{\tt\small haoliguo@stanford.edu}
+\and
+Andrew Simpson\\
+{\tt\small asimpso8@stanford.edu}
 }
 
 \maketitle
@@ -59,40 +58,30 @@ First line of institution2 address\\
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
+Self-driving vehicles are going to be of enormous economic impact over the coming decade. Creating models that meet or exceed the ability of a human driver could save thousands of lives a year. 
 
-Please follow the steps outlined below when submitting your manuscript to
-the IEEE Computer Society Press.  This style guide now has several
-important modifications (for example, you are no longer warned against the
-use of sticky tape to attach your artwork to the paper), so all authors
-should read this new version.
+Udacity has an ongoing challenge to create an open source self-driving car. In there second challenge Udacity released a dataset of images taken while driving along with the corresponding steering angle and ancillary sensor data for a training set (left, right, and center cameras with interpolated angles based on camera angle). The goal of the challenge was to find a model that, given a image taken while driving, will minimize the RMSE (root mean square error) between what the model predicts and the actual steering angle produced by a human driver.
+
+From this challenge, several top models emerged. The top three teams had an RMSE of approximately 0.055 (a guess of the mean angle, 0, would predict 0.2067).
 
 %-------------------------------------------------------------------------
-\subsection{Language}
+\section{Problem Statement}
 
-All manuscripts must be in English.
+The dataset consists of
 
-\subsection{Dual submission}
+One common idea in the different teams was to flip the training on the y axis to account for any turn asymmetry.
+
+The evaluation of model is based on the RMSE on the validation set
+
+
+
+\section{Technical Approach}
 
 Please refer to the author guidelines on the CVPR 2015 web page for a
 discussion of the policy on dual submissions.
 
-\subsection{Paper length}
-For CVPR 2015, the rules about paper length have changed, so please
-read this section carefully. Papers, excluding the references section,
-must be no longer than eight pages in length. The references section
-will not be included in the page count, and there is no limit on the
-length of the references section. For example, a paper of eight pages
-with two pages of references would have a total length of 10 pages.
-{\bf Unlike previous years, there will be no extra page charges for
-  CVPR 2015.}
-
-Overlength papers will simply not be reviewed.  This includes papers
-where the margins and formatting are deemed to have been significantly
-altered from those laid down by this style guide.  Note that this
-\LaTeX\ guide already sets figure captions and references in a smaller font.
-The reason such papers will not be reviewed is that there is no provision for
-supervised revisions of manuscripts.  The reviewing process cannot determine
-the suitability of the paper for presentation in eight pages if it is
+\section{Preliminary Results}
+paper for presentation in eight pages if it is
 reviewed in eleven.  
 
 %-------------------------------------------------------------------------
