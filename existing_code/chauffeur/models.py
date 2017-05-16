@@ -311,9 +311,9 @@ class RegressionModel(BaseModel):
         #steps_per_epoch= epoch_size/
         history = self.model.fit_generator(
             training_generator,
-            #validation_data=validation_generator,
+            validation_data=validation_generator,
             steps_per_epoch=epoch_size/batch_size,
-            #nb_val_samples=validation_size,
+            validation_steps=validation_size/batch_size,
             nb_epoch=epochs,
             verbose=1,
             )
