@@ -26,4 +26,21 @@ Authors.
 \newblock Frobnication tutorial, 2014.
 \newblock Supplied as additional material {\tt tr.pdf}.
 
+\bibitem{bojarski2016end}
+M.~Bojarski, D.~Del~Testa, D.~Dworakowski, B.~Firner, B.~Flepp, P.~Goyal, L.~D.
+  Jackel, M.~Monfort, U.~Muller, J.~Zhang, et~al.
+\newblock End to end learning for self-driving cars.
+\newblock {\em arXiv preprint arXiv:1604.07316}, 2016.
+
+\bibitem{hochreiter1997long}
+S.~Hochreiter and J.~Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural computation}, 9(8):1735--1780, 1997.
+
+\bibitem{Tran_2015_ICCV}
+D.~Tran, L.~Bourdev, R.~Fergus, L.~Torresani, and M.~Paluri.
+\newblock Learning spatiotemporal features with 3d convolutional networks.
+\newblock In {\em The IEEE International Conference on Computer Vision (ICCV)},
+  December 2015.
+
 \end{thebibliography}

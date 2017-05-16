@@ -41,17 +41,17 @@ def make_np_data(input_path, output_path, cam_location, type):
         # cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
         #print(current_out_filename)
         np.save(current_out_filename, cv_image)
-        # plt.imshow(cv_image)
+        #plt.imshow(cv_image)
 
     #np.save(os.path.join(output_path, 'labels_{}_{}.npy'.format(type, cam_location)), labels)
 
 make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "center", "training")
-make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "left", "training")
-make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "right", "training")
+#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "left", "training")
+#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "right", "training")
 
-make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "center", "validation")
-make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "left", "validation")
-make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "right", "validation")
+#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "center", "validation")
+#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "left", "validation")
+#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "right", "validation")
 
 
 

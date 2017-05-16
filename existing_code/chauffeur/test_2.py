@@ -11,7 +11,7 @@ init_model_config = RegressionModel.create(
 model = load_from_config(init_model_config)
 
 # this path contains a dataset in the prescribed format
-dataset = load_dataset('C:\\cs231n17\\project\\code\\test_out')
+dataset = load_dataset('M:\\selfdrive\\SelfDrivingData\\test_out')
 
 # snapshots the model after each epoch
 snapshot = SnapshotCallback(
@@ -30,5 +30,4 @@ model.fit(dataset, {
 model_config = model.save('/tmp/regression.keras')
 
 # evaluate the model on the test holdout
-print
 print(model.evaluate(dataset))
