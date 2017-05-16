@@ -35,7 +35,7 @@
 % just like the second author.
 % To save space, use either the email address or home page, not both
 \and
-Haoli Gui\\
+Haoli Guo\\
 {\tt\small haoliguo@stanford.edu}
 \and
 Andrew Simpson\\
@@ -54,25 +54,72 @@ Andrew Simpson\\
 \section{Introduction}
 Self-driving vehicles are going to be of enormous economic impact over the coming decade. Creating models that meet or exceed the ability of a human driver could save thousands of lives a year. 
 
-Udacity has an ongoing challenge to create an open source self-driving car. In there second challenge Udacity released a dataset of images taken while driving along with the corresponding steering angle and ancillary sensor data for a training set (left, right, and center cameras with interpolated angles based on camera angle). The goal of the challenge was to find a model that, given a image taken while driving, will minimize the RMSE (root mean square error) between what the model predicts and the actual steering angle produced by a human driver.
+Udacity has an ongoing challenge to create an open source self-driving car. In there second challenge Udacity released a dataset of images taken while driving along with the corresponding steering angle and ancillary sensor data for a training set (left, right, and center cameras with interpolated angles based on camera angle). The goal of the challenge was to find a model that, given a image taken while driving, will minimize the RMSE (root mean square error) between what the model predicts and the actual steering angle produced by a human driver. From this challenge, several top models emerged. The top three teams had an RMSE of approximately 0.055 (a guess of the mean angle, 0, would predict 0.2067).
 
-From this challenge, several top models emerged. The top three teams had an RMSE of approximately 0.055 (a guess of the mean angle, 0, would predict 0.2067).
+The problem we want to investigate is one of the self-driving car challenges on Udacity. Taking image frames from a camera mounted to the windshield of a car, we want to predict the appropriate steering angle. The input of our algorithm are the image frames in JPG format. We use a variety of techniques including CNN, LSTM, ResNets, etc. to output a predicted steering angle in numerical values. 
+
+The motivation of the project is to eliminate the need for hand-coding rules and instead create a system that learns by observing. Predicting steering angle is one important part of the end-to-end approach to self-driving car and would allow us to explore the full power of neural networks. For example, using only steering angle as the training signal, deep neural networks can automatically extract features to help position the road to make the prediction.
+
+
 
 %-------------------------------------------------------------------------
 \section{Related Work}
 
 NVIDIA released a paper last year "End to End Learning for Self-Driving Cars." In this paper the authors used a relatively basic CNN architecture. The layout of the architecture can be seen in Figure \ref{nvidiaimage}. Augmentation of the data collected was found to be important. The authors used artificial shifts and rotations of the training set. Left and right cameras with interpolated steering angles were also incorporated.
-
-In the Udacity challenge team Chauffeur placed third with an RMSE of 0.0572. This team used a large pretrained CNN model. This model was then modified to have an output of approximately 3000 features. This output was then passed into a relatively simple LSTM (long short-term memory \cite{hochreiter1997long}) network with the best model having a window of 50 images or 2.5 seconds of video.
-
-\begin{figure}[t]
+\begin{figure}[!htb]
 	\includegraphics[width=6cm]{nvidiacnn}
 	\centering
 	\caption{CNN architecture used in \cite{bojarski2016end}. The network contains approximately 27 million connections and 250 thousand parameters.}
 	\label{nvidiaimage}
 \end{figure}
+
+
+
+Learning Spatiotemporal Features with 3D Convolutional Networks introduces how to construct 3D Convolutional Networks to capture spatiotemporal features in a sequence of images or videos \cite{Tran_2015_ICCV}. Beyond Short Snippets: Deep Networks for Video Classification describes two ways including using LSTM to deal with videos \cite{yue2015beyond}.
+
+Deep Residual Learning for Image Recognition \cite{he2016deep} and Densely Connected Convolutional Networks \cite{huang2016densely} describe the techniques to construct residual connections between different layers and make it easier to train deep neural networks. 
+
+
+
 \section{Methods}
 
+The first examined model is based on Team Komanda's model. The model performs a mapping from sequences of images (or one single video) to sequences of steering angles. Although the target is only the steering angle, this model predicts not only the steering angle, but also the vehicle speed and the torque applied to the steering wheel, which would be used to predict future steering angle. 
+
+The model is consisted by a 3D convolutional stack and a RNN (LSTM) layer after it. The 3D convolutional stack contains four 3D convolutional layers followed by several fully connected layers, converting to a vector with 128 activations in the end. Each 3D convolutional layer will also produce an auxiliary output to be added to the final fully connected layer (residual connect). The output from this 3D convolutional stack will have shape (batch\_size, seq\_len, 128).
+
+How 3D convolutional layer works is similar to 2D conv, the only difference is that in addition to height and width, now we have the third dimension depth. Instead of having a 2D filter (if we ignore the channel dimension for a while) moving within the image along height and width, now we have a 3D filter moving along with height, width and depth. If the input has shape (D1, H1,  W1, C), then the output would have shape (D2, H2, W2, F) where F is the number of filters. D2, H2, W2 could be calculated given stride and padding in its dimension.
+
+Combining the output from 3D convolutional layer stack and previous predicted steering angle, torque and speed, we have the input to RNN layer. This input is a tuple of two tensors with shape (batch\_size, seq\_len, 128) and (batch\_size, seq\_len, 3). Based on this input, RNN will make predictions for steering angle, torque and speed. 
+
+The final loss is consisted of major loss from steering angle prediction and auxiliary loss from torque and speed. 
+$loss=L2(steering angle)+auxiliary weight*(L2(steering angle)+L2(torque)+L2(speed))$
+
+The L2 loss here is the loss across both batch\_size and seq\_len as we have the true label for each point in the sequence.
+
+During training, we use both ground truth and previous predicted angle, torque and speed as our input to RNN. During test, we only use previous prediction as the input to RNN.
+\begin{figure}[!htb]
+	\includegraphics[width=6cm]{Komanda.JPG}
+	\centering
+	\caption{Architecture used for team Komanda.}
+	\label{komanda}
+\end{figure}
+
+Being inspired by an existing model (Team Rambo), we consider converting the images into grayscale and computing lag 1 differences between frames to preprocess the data. Two consecutive differenced images were used as the input of the model. For example, at time $t, [x_{t} - x_{t-1}, x_{t-1} - x_{t-2}]$ is used as input where x corresponds to the grayscale image. Since two consecutive differenced images were used, the number of channels is 2, but this is a hyperparameter for tuning. 
+
+In the training process, the model consists of 3 streams that are assembled at the final layer. Figure \ref{rambo} shows the architecture of the model. 
+\begin{figure}[!htb]
+	\includegraphics[width=6cm]{rambo.JPG}
+	\centering
+	\caption{Architecture used for team Rambo.}
+	\label{rambo}
+\end{figure}
+Each stream of the model consists of a sequence of convolutional layers, interspersed with activation functions such as ReLU, Leaky ReLU or Parametric ReLU (PReLU). Adam optimization and L-2 loss were adopted as the optimization method and loss equation.
+
+A third model from team Chauffeur was examined, This team placed third with an RMSE of 0.0572. This model had a core structure that was similar to that if team Komanda with the exception of not using 3D convolutional networks. This team used a large pretrained CNN model. This model was then modified to have an output of approximately 3000 features. This output was then passed into a relatively simple LSTM (long short-term memory \cite{hochreiter1997long}) network with the best model having a window of 50 images or 2.5 seconds of video.
+
+
+
+\subsection{Potential Methods}
 
 A potential method is taking the last $n$ frames from the training set allow use of networks using 3D convolutions \cite{Tran_2015_ICCV}. Creating an architecture like resnet with these layers may capture important image information between layers. Additionally passing the processed data from this network into an RNN (using LSTM) could allow for knowledge of the previous states to be used to predict the next state of the steering angle. Additional methods that different teams used that could be used with this approach is to take the difference between frames instead of the raw image data. Transfer learning of a large network would also likely be helpful for model development.
 
@@ -81,361 +128,26 @@ During experimentation, copying the general structure from \cite{bojarski2016end
 
 
 \section{Dataset and Features}
-paper for presentation in eight pages if it is
-reviewed in eleven.  
+The dataset we used is provided by Udacity, which is generated by NVIDIA’s DAVE-2 System \cite{bojarski2016end}. Specifically, three cameras are mounted behind the windshield of the data-acquisition car. Time-stamped video from the cameras is captured simultaneously with the steering angle applied by the human driver. This steering command is obtained by tapping into the vehicle’s Controller Area Network (CAN) bus. In order to make the system independent of the car geometry, they represent the steering command as 1/r where r is the turning radius in meters. They use 1/r instead of r to prevent a singularity when driving straight (the turning radius for driving straight is infinity). 1/r smoothly transitions through zero from left turns (negative values) to right turns (positive values). Training data contains single images sampled from the video, paired with the corresponding steering command (1/r).
+
+In addition to the images got from the center camera, images for two specific off-center shifts can be obtained from the left and the right camera. Additional shifts between the cameras and all rotations are simulated by viewpoint transformation of the image from the nearest camera. This could regarded as a way we used to augment the data.
+
+Raw images are of size 640 x 480 and have three channels RGB. For one of our models, we resized the images to 256 x 192, converted from RGB color format to grayscale, computed lag 1 differences between frames and used 2 consecutive differenced images. For example, at time t we used $[x_{t} - x_{t-1}, x_{t-1} - x_{t-2}]$ as input where x corresponds to the grayscale image.
+
+Training data set contains 101397 frames and corresponding labels including steering angle, torque and speed. We further split this data set into training and validation in a 80/20 fashion. And there is also a test set which contains 5615 frames. 
 
 \section{Experiments, Results, and Discussion}
 As a baseline, the work from \cite{bojarski2016end} is being reproduced on the dataset from Udacity. A model, using Keras, was constructed that followed the layout from \cite{bojarski2016end}. Currently the results have only produced a result of 0.19 on the validation set. This result is better than guessing all zeros, but is not a competitive score. Further data augmentation is being examined to improve the RMSE on the validation set.
 
-Team Chauffeurs code was examined. In testing this code it was found to have a high RMSE at first, but eventually produced quality results. The core idea of this model can likely be extended to other methods such as 3D convolution with temporal data. This may or may not aid the later LSTM network, which would, by its own architecture, contain temporal information.
+Additionally, as preliminary results, we succeed to make our model overfit on a small training data set. With training on larger data set on single GPU Google Cloud Instance for 10 hours, we achieved 0.2 RMSE for steering angle prediction on validation set. However, the error on validation set is strangely nonmonotonic. As we trained model, even without overfitting, the error on validation set changed non monotonically.
+
+Team Chauffeurs code was examined and reproduced. In testing this code it was found to have a high RMSE at first, but eventually produced quality results (RMSE 0.0672). The core idea of this model can likely be extended to other methods such as 3D convolution with temporal data. This may or may not aid the later LSTM network, which would, by its own architecture, contain temporal information.
 
 In examining these models we think it would be possible to combine different aspects in order to obtain similar or superior results. 
 
 
 \section{Conclusion and Future Work}
 Finding better ways to augment the training dataset allows for an effectively larger training set size, which will help better generalization on the validation and testing sets.
-
-
-%-------------------------------------------------------------------------
-\subsection{The ruler}
-The \LaTeX\ style defines a printed ruler which should be present in the
-version submitted for review.  The ruler is provided in order that
-reviewers may comment on particular lines in the paper without
-circumlocution.  If you are preparing a document using a non-\LaTeX\
-document preparation system, please arrange for an equivalent ruler to
-appear on the final output pages.  The presence or absence of the ruler
-should not change the appearance of any other content on the page.  The
-camera ready copy should not contain a ruler. (\LaTeX\ users may uncomment
-the \verb'\cvprfinalcopy' command in the document preamble.)  Reviewers:
-note that the ruler measurements do not align well with lines in the paper
---- this turns out to be very difficult to do well when the paper contains
-many figures and equations, and, when done, looks ugly.  Just use fractional
-references (e.g.\ this line is $095.5$), although in most cases one would
-expect that the approximate location will be adequate.
-
-\subsection{Mathematics}
-
-Please number all of your sections and displayed equations.  It is
-important for readers to be able to refer to any particular equation.  Just
-because you didn't refer to it in the text doesn't mean some future reader
-might not need to refer to it.  It is cumbersome to have to use
-circumlocutions like ``the equation second from the top of page 3 column
-1''.  (Note that the ruler will not be present in the final copy, so is not
-an alternative to equation numbers).  All authors will benefit from reading
-Mermin's description of how to write mathematics:
-\url{http://www.pamitc.org/documents/mermin.pdf}.
-
-
-\subsection{Blind review}
-
-Many authors misunderstand the concept of anonymizing for blind
-review.  Blind review does not mean that one must remove
-citations to one's own work---in fact it is often impossible to
-review a paper unless the previous citations are known and
-available.
-
-Blind review means that you do not use the words ``my'' or ``our''
-when citing previous work.  That is all.  (But see below for
-techreports.)
-
-Saying ``this builds on the work of Lucy Smith [1]'' does not say
-that you are Lucy Smith; it says that you are building on her
-work.  If you are Smith and Jones, do not say ``as we show in
-[7]'', say ``as Smith and Jones show in [7]'' and at the end of the
-paper, include reference 7 as you would any other cited work.
-
-An example of a bad paper just asking to be rejected:
-\begin{quote}
-\begin{center}
-    An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper we present a performance analysis of our
-   previous paper [1], and show it to be inferior to all
-   previously known methods.  Why the previous paper was
-   accepted without this analysis is beyond me.
-
-   [1] Removed for blind review
-\end{quote}
-
-
-An example of an acceptable paper:
-
-\begin{quote}
-\begin{center}
-     An analysis of the frobnicatable foo filter.
-\end{center}
-
-   In this paper we present a performance analysis of the
-   paper of Smith \etal [1], and show it to be inferior to
-   all previously known methods.  Why the previous paper
-   was accepted without this analysis is beyond me.
-
-   [1] Smith, L and Jones, C. ``The frobnicatable foo
-   filter, a fundamental contribution to human knowledge''.
-   Nature 381(12), 1-213.
-\end{quote}
-
-If you are making a submission to another conference at the same time,
-which covers similar or overlapping material, you may need to refer to that
-submission in order to explain the differences, just as you would if you
-had previously published related work.  In such cases, include the
-anonymized parallel submission~\cite{Authors14} as additional material and
-cite it as
-\begin{quote}
-[1] Authors. ``The frobnicatable foo filter'', F\&G 2014 Submission ID 324,
-Supplied as additional material {\tt fg324.pdf}.
-\end{quote}
-
-Finally, you may feel you need to tell the reader that more details can be
-found elsewhere, and refer them to a technical report.  For conference
-submissions, the paper must stand on its own, and not {\em require} the
-reviewer to go to a techreport for further details.  Thus, you may say in
-the body of the paper ``further details may be found
-in~\cite{Authors14b}''.  Then submit the techreport as additional material.
-Again, you may not assume the reviewers will read this material. 
-
-Sometimes your paper is about a problem which you tested using a tool which
-is widely known to be restricted to a single institution.  For example,
-let's say it's 1969, you have solved a key problem on the Apollo lander,
-and you believe that the CVPR70 audience would like to hear about your
-solution.  The work is a development of your celebrated 1968 paper entitled
-``Zero-g frobnication: How being the only people in the world with access to
-the Apollo lander source code makes us a wow at parties'', by Zeus \etal.
-
-You can handle this paper like any other.  Don't write ``We show how to
-improve our previous work [Anonymous, 1968].  This time we tested the
-algorithm on a lunar lander [name of lander removed for blind review]''.
-That would be silly, and would immediately identify the authors. Instead
-write the following:
-\begin{quotation}
-\noindent
-   We describe a system for zero-g frobnication.  This
-   system is new because it handles the following cases:
-   A, B.  Previous systems [Zeus et al. 1968] didn't
-   handle case B properly.  Ours handles it by including
-   a foo term in the bar integral.
-
-   ...
-
-   The proposed system was integrated with the Apollo
-   lunar lander, and went all the way to the moon, don't
-   you know.  It displayed the following behaviours
-   which show how well we solved cases A and B: ...
-\end{quotation}
-As you can see, the above text follows standard scientific convention,
-reads better than the first version, and does not explicitly name you as
-the authors.  A reviewer might think it likely that the new paper was
-written by Zeus \etal, but cannot make any decision based on that guess.
-He or she would have to be sure that no other authors could have been
-contracted to solve problem B.
-
-FAQ: Are acknowledgements OK?  No.  Leave them for the final copy.
-
-
-\begin{figure}[t]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-\end{center}
-   \caption{Example of caption.  It is set in Roman so that mathematics
-   (always set in Roman: $B \sin A = A \sin B$) may be included without an
-   ugly clash.}
-\label{fig:long}
-\label{fig:onecol}
-\end{figure}
-
-\subsection{Miscellaneous}
-
-\noindent
-Compare the following:\\
-\begin{tabular}{ll}
- \verb'$conf_a$' &  $conf_a$ \\
- \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
-\end{tabular}\\
-See The \TeX book, p165.
-
-The space after \eg, meaning ``for example'', should not be a
-sentence-ending space. So \eg is correct, {\em e.g.} is not.  The provided
-\verb'\eg' macro takes care of this.
-
-When citing a multi-author paper, you may save space by using ``et alia'',
-shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word.)
-However, use it only when there are three or more authors.  Thus, the
-following is correct: ``
-   Frobnication has been trendy lately.
-   It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-   Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
-
-This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...''
-because reference~\cite{Alpher03} has just two authors.  If you use the
-\verb'\etal' macro provided, then you need not worry about double periods
-when used at the end of a sentence as in Alpher \etal.
-
-For this citation style, keep multiple citations in numerical (not
-chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
-\cite{Alpher02,Alpher03,Authors14}.
-
-
-\begin{figure*}
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Example of a short caption, which should be centered.}
-\label{fig:short}
-\end{figure*}
-
-%------------------------------------------------------------------------
-\section{Formatting your paper}
-
-All text must be in a two-column format. The total allowable width of the
-text area is $6\frac78$ inches (17.5 cm) wide by $8\frac78$ inches (22.54
-cm) high. Columns are to be $3\frac14$ inches (8.25 cm) wide, with a
-$\frac{5}{16}$ inch (0.8 cm) space between them. The main title (on the
-first page) should begin 1.0 inch (2.54 cm) from the top edge of the
-page. The second and following pages should begin 1.0 inch (2.54 cm) from
-the top edge. On all pages, the bottom margin should be 1-1/8 inches (2.86
-cm) from the bottom edge of the page for $8.5 \times 11$-inch paper; for A4
-paper, approximately 1-5/8 inches (4.13 cm) from the bottom edge of the
-page.
-
-%-------------------------------------------------------------------------
-\subsection{Margins and page numbering}
-
-All printed material, including text, illustrations, and charts, must be kept
-within a print area 6-7/8 inches (17.5 cm) wide by 8-7/8 inches (22.54 cm)
-high.
-Page numbers should be in footer with page numbers, centered and .75
-inches from the bottom of the page and make it start at the correct page
-number rather than the 4321 in the example.  To do this fine the line (around
-line 23)
-\begin{verbatim}
-%\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
-\end{verbatim}
-where the number 4321 is your assigned starting page.
-
-Make sure the first page is numbered by commenting out the first page being
-empty on line 46
-\begin{verbatim}
-%\thispagestyle{empty}
-\end{verbatim}
-
-
-%-------------------------------------------------------------------------
-\subsection{Type-style and fonts}
-
-Wherever Times is specified, Times Roman may also be used. If neither is
-available on your word processor, please use the font closest in
-appearance to Times to which you have access.
-
-MAIN TITLE. Center the title 1-3/8 inches (3.49 cm) from the top edge of
-the first page. The title should be in Times 14-point, boldface type.
-Capitalize the first letter of nouns, pronouns, verbs, adjectives, and
-adverbs; do not capitalize articles, coordinate conjunctions, or
-prepositions (unless the title begins with such a word). Leave two blank
-lines after the title.
-
-AUTHOR NAME(s) and AFFILIATION(s) are to be centered beneath the title
-and printed in Times 12-point, non-boldface type. This information is to
-be followed by two blank lines.
-
-The ABSTRACT and MAIN TEXT are to be in a two-column format.
-
-MAIN TEXT. Type main text in 10-point Times, single-spaced. Do NOT use
-double-spacing. All paragraphs should be indented 1 pica (approx. 1/6
-inch or 0.422 cm). Make sure your text is fully justified---that is,
-flush left and flush right. Please do not place any additional blank
-lines between paragraphs.
-
-Figure and table captions should be 9-point Roman type as in
-Figures~\ref{fig:onecol} and~\ref{fig:short}.  Short captions should be centred.
-
-\noindent Callouts should be 9-point Helvetica, non-boldface type.
-Initially capitalize only the first word of section titles and first-,
-second-, and third-order headings.
-
-FIRST-ORDER HEADINGS. (For example, {\large \bf 1. Introduction})
-should be Times 12-point boldface, initially capitalized, flush left,
-with one blank line before, and one blank line after.
-
-SECOND-ORDER HEADINGS. (For example, { \bf 1.1. Database elements})
-should be Times 11-point boldface, initially capitalized, flush left,
-with one blank line before, and one after. If you require a third-order
-heading (we discourage it), use 10-point Times, boldface, initially
-capitalized, flush left, preceded by one blank line, followed by a period
-and your text on the same line.
-
-%-------------------------------------------------------------------------
-\subsection{Footnotes}
-
-Please use footnotes\footnote {This is what a footnote looks like.  It
-often distracts the reader from the main flow of the argument.} sparingly.
-Indeed, try to avoid footnotes altogether and include necessary peripheral
-observations in
-the text (within parentheses, if you prefer, as in this sentence).  If you
-wish to use a footnote, place it at the bottom of the column on the page on
-which it is referenced. Use Times 8-point type, single-spaced.
-
-
-%-------------------------------------------------------------------------
-\subsection{References}
-
-List and number all bibliographical references in 9-point Times,
-single-spaced, at the end of your paper. When referenced in the text,
-enclose the citation number in square brackets, for
-example~\cite{Authors14}.  Where appropriate, include the name(s) of
-editors of referenced books.
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Frobnability \\
-\hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results.   Ours is better.}
-\end{table}
-
-%-------------------------------------------------------------------------
-\subsection{Illustrations, graphs, and photographs}
-
-All graphics should be centered.  Please ensure that any point you wish to
-make is resolvable in a printed copy of the paper.  Resize fonts in figures
-to match the font in the body text, and choose line widths which render
-effectively in print.  Many readers (and reviewers), even of an electronic
-copy, will choose to print your paper in order to read it.  You cannot
-insist that they do otherwise, and therefore must not assume that they can
-zoom in to see tiny details on a graphic.
-
-When placing figures in \LaTeX, it's almost always best to use
-\verb+\includegraphics+, and to specify the  figure width as a multiple of
-the line width as in the example below
-{\small\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]
-                   {myfile.eps}
-\end{verbatim}
-}
-
-
-%-------------------------------------------------------------------------
-\subsection{Color}
-
-Please refer to the author guidelines on the CVPR 2015 web page for a discussion
-of the use of color in your document.
-
-%------------------------------------------------------------------------
-\section{Final copy}
-
-You must include your signed IEEE copyright release form when you submit
-your finished paper. We MUST have this form before your paper can be
-published in the proceedings.
 
 
 {\small
