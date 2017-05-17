@@ -79,7 +79,7 @@ NVIDIA released a paper last year "End to End Learning for Self-Driving Cars" \c
 
 \section{Methods}
 
-The first examined model from the Udacity challenge is based on Team Komanda's model. The model performs a mapping from sequences of images (or one single video) to sequences of steering angles. Although the target is only the steering angle, this model predicts not only the steering angle, but also the vehicle speed and the torque applied to the steering wheel, which would be used to predict future steering angle. 
+We investigated the top three existing models from the Udacity challenge to study how they work. The first examined model from the challenge is based on Team Komanda's model. The model performs a mapping from sequences of images (or one single video) to sequences of steering angles. Although the target is only the steering angle, this model predicts not only the steering angle, but also the vehicle speed and the torque applied to the steering wheel, which would be used to predict future steering angle. 
 
 The model is consisted by a 3D convolutional stack and a RNN (LSTM) layer after it. The 3D convolutional stack contains four 3D convolutional layers followed by several fully connected layers, converting to a vector with 128 activations in the end. Each 3D convolutional layer will also produce an auxiliary output to be added to the final fully connected layer (residual connect). The output from this 3D convolutional stack will have shape (batch\_size, seq\_len, 128).
 
@@ -100,7 +100,7 @@ During training, we use both ground truth and previous predicted angle, torque a
 	\label{komanda}
 \end{figure}
 
-The next model we examined from the challenge was from Team Rambo. We consider converting the images into grayscale and computing lag 1 differences between frames to preprocess the data. Two consecutive differenced images were used as the input of the model. For example, at time $t, [x_{t} - x_{t-1}, x_{t-1} - x_{t-2}]$ is used as input where x corresponds to the grayscale image. Since two consecutive differenced images were used, the number of channels is 2, but this is a hyperparameter for tuning. 
+The next model we examined from the challenge was from Team Rambo. To preprocess the data, the images were converted to grayscale and lag 1 differences between frames were computed. Two consecutive differenced images were used as the input of the model. For example, at time $t, [x_{t} - x_{t-1}, x_{t-1} - x_{t-2}]$ is used as input where x corresponds to the grayscale image. Since two consecutive differenced images were used, the number of channels is 2, but this is a hyperparameter for tuning. 
 
 In the training process, the model consists of 3 streams that are assembled at the final layer. Figure \ref{rambo} shows the architecture of the model. 
 \begin{figure}[!htb]
@@ -137,7 +137,7 @@ As a baseline, the work from \cite{bojarski2016end} is being reproduced on the d
 
 Additionally, as preliminary results, we succeed to make our model overfit on a small training data set. With training on larger data set on single GPU Google Cloud Instance for 10 hours, we achieved 0.2 RMSE for steering angle prediction on validation set. However, the error on validation set is strangely nonmonotonic. As we trained model, even without overfitting, the error on validation set changed non monotonically.
 
-Team Chauffeurs code was examined and reproduced. In testing this code it was found to have a high RMSE at first, but eventually produced quality results (RMSE 0.0672). The core idea of this model can likely be extended to other methods such as 3D convolution with temporal data. This may or may not aid the later LSTM network, which would, by its own architecture, contain temporal information.
+Team Chauffeur's code was examined and reproduced. In testing this code it was found to have a high RMSE at first, but eventually produced quality results (RMSE 0.0672). The core idea of this model can likely be extended to other methods such as 3D convolution with temporal data. This may or may not aid the later LSTM network, which would, by its own architecture, contain temporal information.
 
 In examining these models we think it would be possible to combine different aspects in order to obtain similar or superior results. 
 
