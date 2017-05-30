@@ -86,34 +86,34 @@ class BaseModel(object):
         """
         raise NotImplemented
 
-    def predict_all(self, dataset, test_only=False):
-        """
-        todo support multi-class output
+    # def predict_all(self, dataset, test_only=False):
+    #     """
+    #     todo support multi-class output
+    #
+    #     @returns - (y_pred, y_true)
+    #     """
+    #     batch_size = 32
+    #     if test_only:
+    #         generator = dataset.testing_generator(batch_size)
+    #         n_total = dataset.testing_size()
+    #     else:
+    #         generator = dataset.sequential_generator(batch_size)
+    #         n_total = len(dataset.labels)
+    #
+    #     output_dim = self.output_dim()
+    #     n_batches = n_total / batch_size
+    #     y_pred = np.empty(n_batches * batch_size)
+    #     y_true = np.empty(n_batches * batch_size)
+    #
+    #     for i in xrange(n_batches):
+    #         x, y = generator.next()
+    #         start, end = (i * batch_size, (i + 1) * batch_size)
+    #         y_pred[start:end] = self.predict_on_batch(x).ravel()
+    #         y_true[start:end] = y.ravel()
+    #
+    #     return y_pred, y_true
 
-        @returns - (y_pred, y_true)
-        """
-        batch_size = 32
-        if test_only:
-            generator = dataset.testing_generator(batch_size)
-            n_total = dataset.testing_size()
-        else:
-            generator = dataset.sequential_generator(batch_size)
-            n_total = len(dataset.labels)
-
-        output_dim = self.output_dim()
-        n_batches = n_total / batch_size
-        y_pred = np.empty(n_batches * batch_size)
-        y_true = np.empty(n_batches * batch_size)
-
-        for i in xrange(n_batches):
-            x, y = generator.next()
-            start, end = (i * batch_size, (i + 1) * batch_size)
-            y_pred[start:end] = self.predict_on_batch(x).ravel()
-            y_true[start:end] = y.ravel()
-
-        return y_pred, y_true
-
-
+'''
 class CategoricalModel(BaseModel):
     TYPE = 'categorical'
 
@@ -168,6 +168,7 @@ class CategoricalModel(BaseModel):
             callbacks=(callbacks or []))
 
     def evaluate(self, dataset):
+        print("cat eval")
         n_batches = 32 * (dataset.get_testing_size() / 32)
         testing_generator = (dataset
             .testing_generator(32)
@@ -274,6 +275,7 @@ class CategoricalModel(BaseModel):
             'model_uri': model_path,
             'thresholds': thresholds,
         }
+'''
 
 class RegressionModel(BaseModel):
     TYPE = 'regression'
@@ -299,7 +301,7 @@ class RegressionModel(BaseModel):
                 .with_percentile_sampling(pctl_sampling, pctl_thresholds))
 
         training_generator = training_generator.scale_labels(self.scale)
-        validation_generator = (dataset.validation_generator(batch_size).scale_labels(self.scale))
+        validation_generator = (dataset.validation_generator_new(batch_size).scale_labels(self.scale))
 
         validation_size = training_args.get(
             'validation_size', validation_generator.get_size())
@@ -321,7 +323,18 @@ class RegressionModel(BaseModel):
         return history
 
     def evaluate(self, dataset):
-        generator = dataset.testing_generator(32)
+        print("reg eval")
+        generator = dataset.testing_generator(64)
+        return std_evaluate(self, generator)
+
+    def evaluate_v2(self, dataset):
+        print("reg eval")
+        generator = dataset.validation_generator(64)
+        return std_evaluate(self, generator)
+
+    def evaluate_v3(self, dataset):
+        print("reg eval")
+        generator = dataset.training_generator(64)
         return std_evaluate(self, generator)
 
     def predict_on_batch(self, batch):
@@ -364,7 +377,7 @@ class RegressionModel(BaseModel):
                use_adadelta=True,
                learning_rate=0.01,
                W_l2=0.0001,
-               scale=16):
+               scale=1):
         """
         """
         model = Sequential()
@@ -416,7 +429,7 @@ class RegressionModel(BaseModel):
         model.compile(
             loss='mean_squared_error',
             optimizer=optimizer,
-            metrics=['rmse'])
+            metrics=['rmse', rmse])
 
         # Write model to designated path
         model.save(model_path)
@@ -428,6 +441,134 @@ class RegressionModel(BaseModel):
             'scale': scale,
         }
 
+    # @classmethod
+    # def create(cls,
+    #            model_path,
+    #            input_shape=(120, 320, 3),
+    #            use_adadelta=True,
+    #            learning_rate=0.01,
+    #            W_l2=0.0001,
+    #            scale=1):
+    #     """
+    #     """
+    #     model = Sequential()
+    #     model.add(Conv2D(16, 5, 5,
+    #         input_shape=input_shape,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(SpatialDropout2D(0.1))
+    #     model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     model.add(Conv2D(20, 5, 5,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(SpatialDropout2D(0.1))
+    #     model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     model.add(Conv2D(40, 3, 3,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(SpatialDropout2D(0.1))
+    #     model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     model.add(Conv2D(60, 3, 3,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(SpatialDropout2D(0.1))
+    #     model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     model.add(Conv2D(80, 2, 2,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(SpatialDropout2D(0.1))
+    #     model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     model.add(Conv2D(128, 2, 2,
+    #         init= "he_normal",
+    #         activation='relu',
+    #         border_mode='same'))
+    #     model.add(Flatten())
+    #     model.add(Dropout(0.5))
+    #     model.add(Dense(
+    #         output_dim=1,
+    #         init='he_normal',
+    #         W_regularizer=l2(W_l2)))
+    #
+    #     optimizer = ('adadelta' if use_adadelta
+    #                  else SGD(lr=learning_rate, momentum=0.9))
+    #
+    #     model.compile(
+    #         loss='mean_squared_error',
+    #         optimizer=optimizer,
+    #         metrics=['rmse', rmse])
+    #
+    #     # Write model to designated path
+    #     model.save(model_path)
+    #
+    #     # Return model_config params compatible with constructor
+    #     return {
+    #         'type': RegressionModel.TYPE,
+    #         'model_uri': model_path,
+    #         'scale': scale,
+    #     }
+
+    @classmethod
+    def create(cls,
+               model_path,
+               input_shape=(120, 320, 3),
+               use_adadelta=True,
+               learning_rate=0.01,
+               W_l2=0.0001,
+               scale=1):
+        """
+        """
+        model = Sequential()
+        model.add(Conv2D(3, (5, 5), strides=2, activation='relu', input_shape=(120, 320, 3)))
+        # model.add(BatchNormalization())
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        print(model.layers[-1].output_shape)
+        model.add(Conv2D(24, (5, 5), strides=2, activation='relu'))
+        model.add(Conv2D(36, (5, 5), strides=2, activation='relu'))
+        # model.add(BatchNormalization())
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        print(model.layers[-1].output_shape)
+        model.add(Conv2D(48, (3, 3), strides=2, activation='relu'))
+        # model.add(BatchNormalization())
+        print(model.layers[-1].output_shape)
+        model.add(Conv2D(64, (3, 3), activation='relu'))
+        # model.add(BatchNormalization())
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        print(model.layers[-1].output_shape)
+        model.add(Conv2D(64, (3, 3), activation='relu'))
+        # model.add(BatchNormalization())
+        print(model.layers[-1].output_shape)
+        model.add(Flatten())
+        model.add(Dense(1164, activation='relu'))
+        # model.add(Dropout(0.2))
+        model.add(Dense(100, activation='relu'))
+        # model.add(Dropout(0.2))
+        model.add(Dense(50, activation='relu'))
+        # model.add(Dropout(0.2))
+        model.add(Dense(10, activation='relu'))
+        model.add(Dense(1))
+        optimizer = ('adadelta' if use_adadelta
+                     else SGD(lr=learning_rate, momentum=0.9))
+
+        model.compile(
+            loss='mean_squared_error',
+            optimizer='rmsprop',
+            metrics=['rmse', rmse])
+
+        # Write model to designated path
+        model.save(model_path)
+
+        # Return model_config params compatible with constructor
+        return {
+            'type': RegressionModel.TYPE,
+            'model_uri': model_path,
+            'scale': scale,
+        }
+    '''
     @classmethod
     def create_resnet_inception_v1(cls,
                                    model_path,
@@ -569,8 +710,8 @@ class RegressionModel(BaseModel):
             'model_uri': model_path,
             'scale': scale,
         }
-
-
+'''
+'''
 class MixtureModel(BaseModel):
     """
     """
@@ -622,6 +763,41 @@ class MixtureModel(BaseModel):
         mse = err_sum / err_count
         rmse = np.sqrt(mse)
         return [mse, rmse]
+
+    def evaluate_v2(self, dataset):
+        batch_size = 32
+        testing_size = dataset.get_validation_size()
+        testing_generator = dataset.validation_generator(batch_size)
+        n_batches = testing_size / batch_size
+
+        err_sum = 0.
+        err_count = 0.
+        for _ in xrange(n_batches):
+            X_batch, y_batch = testing_generator.next()
+            y_pred = self.predict_on_batch(X_batch)
+            err_sum += np.sum((y_batch - y_pred) ** 2)
+            err_count += len(y_pred)
+        mse = err_sum / err_count
+        rmse = np.sqrt(mse)
+        return [mse, rmse]
+
+    def evaluate_v3(self, dataset):
+        batch_size = 32
+        testing_size = dataset.get_training_size()
+        testing_generator = dataset.training_generator(batch_size)
+        n_batches = testing_size / batch_size
+
+        err_sum = 0.
+        err_count = 0.
+        for _ in xrange(n_batches):
+            X_batch, y_batch = testing_generator.next()
+            y_pred = self.predict_on_batch(X_batch)
+            err_sum += np.sum((y_batch - y_pred) ** 2)
+            err_count += len(y_pred)
+        mse = err_sum / err_count
+        rmse = np.sqrt(mse)
+        return [mse, rmse]
+
 
     def make_stateful_predictor(self,
                                 smoothing=True,
@@ -726,6 +902,7 @@ class EnsembleModel(BaseModel):
             callbacks=(callbacks or []))
 
     def evaluate(self, dataset):
+        print("ensemble eval")
         batch_size = 32
         testing_size = dataset.get_testing_size()
         testing_generator = dataset.testing_generator(batch_size)
@@ -862,6 +1039,7 @@ class EnsembleModel(BaseModel):
             'input_model_config': input_model_config,
         }
 
+
 class LstmModel(BaseModel):
     """
     """
@@ -909,6 +1087,7 @@ class LstmModel(BaseModel):
             callbacks=callbacks)
 
     def evaluate(self, dataset):
+        print("lstm eval")
         batch_size = 32
         testing_size = dataset.get_testing_size()
         testing_generator = (dataset
@@ -1021,7 +1200,6 @@ class LstmModel(BaseModel):
             'scale': scale
         }
 
-
 class TransferLstmModel(BaseModel):
     """
     """
@@ -1075,6 +1253,7 @@ class TransferLstmModel(BaseModel):
             callbacks=callbacks)
 
     def evaluate(self, dataset):
+        print("trans lstm eval")
         testing_generator = (dataset
             .testing_generator(32)
             .with_concat_original(self.concat_original)
@@ -1269,9 +1448,9 @@ class TransferLstmModel(BaseModel):
             'scale': scale,
             'concat_original': True,
         }
+'''
 
-
-
+'''
 def inception_layer(model, tower_size):
     """
     """
@@ -1382,8 +1561,8 @@ def no_relu_conv_mxn(n_filters, m, n):
             border_mode='same')(input)
 
     return f
-
-
+'''
+'''
 MODEL_CLASS_BY_TYPE = {
     'simple': CategoricalModel,  # backwards compat
     CategoricalModel.TYPE: CategoricalModel,
@@ -1392,6 +1571,12 @@ MODEL_CLASS_BY_TYPE = {
     LstmModel.TYPE: LstmModel,
     TransferLstmModel.TYPE: TransferLstmModel,
     MixtureModel.TYPE: MixtureModel,
+}
+'''
+
+MODEL_CLASS_BY_TYPE = {
+    'simple': RegressionModel,  # backwards compat
+    RegressionModel.TYPE: RegressionModel,
 }
 
 

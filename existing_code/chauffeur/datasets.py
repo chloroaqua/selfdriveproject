@@ -35,7 +35,7 @@ class Dataset(object):
                  training_indexes,
                  testing_indexes,
                  validation_indexes,
-                 image_file_fmt='%d.png.npy'):
+                 image_file_fmt='%d.png.npy', validation_labels=None, validation_base_path=None, images_base_path_val=None):
         """
         @param images_base_path - path to image files
         @param labels - 2d array of all label data
@@ -50,6 +50,9 @@ class Dataset(object):
         self.validation_indexes = validation_indexes
         self.images_base_path = images_base_path
         self.image_file_fmt = image_file_fmt
+        self.validation_labels = validation_labels
+        self.validation_base_path = validation_base_path
+        self.images_base_path_val = images_base_path_val
 
     def get_image_shape(self):
         """
@@ -133,6 +136,15 @@ class Dataset(object):
         """
         return self.get_generator(batch_size, self.validation_indexes, True)
 
+    def validation_generator_new(self, batch_size):
+        """
+        Generator over validation samples.
+
+        @param batch_size - images per batch
+        @return - generator returning (images, labels) batches
+        """
+        return self.get_generator_new(batch_size, self.validation_indexes, True, True)
+
     def sequential_generator(self, batch_size):
         """
         Generator which iterates over each image in sequential order.
@@ -167,6 +179,33 @@ class Dataset(object):
             self.images_base_path,
             self.image_file_fmt,
             shuffle_on_exhaust=shuffle_on_exhaust)
+
+    def get_generator_new(self, batch_size, indexes, shuffle_on_exhaust, val=False):
+        """
+        Helper to get an infinite image loading generator.
+
+        @param batch_size - images per batch
+        @param indexes - 1d array of indexes to include in dataset
+        @param shuffle_on_exhaust - should shuffle data on each full pass
+        @return - generator returning (images, labels) batches
+        """
+        if val:
+            return InfiniteImageLoadingGenerator(
+                batch_size,
+                indexes,
+                self.validation_labels,
+                self.images_base_path_val,
+                self.image_file_fmt,
+                shuffle_on_exhaust=shuffle_on_exhaust)
+        else:
+            return InfiniteImageLoadingGenerator(
+                batch_size,
+                indexes,
+                self.labels,
+                self.images_base_path,
+                self.image_file_fmt,
+                shuffle_on_exhaust=shuffle_on_exhaust)
+
 
     def get_baseline_mse(self):
         """
@@ -332,81 +371,84 @@ class InfiniteImageLoadingGenerator(object):
             scale=self.scale,
             concat_original=self.concat_original)
 
-    def with_timesteps(self, timesteps=None, timestep_delta=1):
-        """
-        Add previous input timesteps.
+    # def with_timesteps(self, timesteps=None, timestep_delta=1):
+    #     """
+    #     Add previous input timesteps.
+    #
+    #     @param timesteps - number of previous labels to append to samples
+    #     @return - image-loading iterator with prev image timesteps
+    #     """
+    #     return InfiniteImageLoadingGenerator(
+    #         batch_size=self.batch_size,
+    #         indexes=self.indexes,
+    #         labels=self.orig_labels,
+    #         images_base_path=self.images_base_path,
+    #         image_file_fmt=self.image_file_fmt,
+    #         shuffle_on_exhaust=self.shuffle_on_exhaust,
+    #         cat_thresholds=self.cat_thresholds,
+    #         pctl_sampling=self.pctl_sampling,
+    #         pctl_thresholds=self.pctl_thresholds,
+    #         timesteps=timesteps,
+    #         timestep_delta=timestep_delta,
+    #         precomputed=self.precomputed,
+    #         scale=self.scale,
+    #         concat_original=self.concat_original)
+    #
+    #
+    #
+    # def precompute_transform(self, transform_model):
+    #     """
+    #     Precompute an encoder transform on the whole dataset and load
+    #     it into memory.
+    #
+    #     @param transform_model- model supporting predict_on_batch
+    #     @return - imag-loading iterator with precomputed transformed input
+    #     """
+    #     encoder = transform_model.as_encoder()
+    #     batch_size = self.batch_size
+    #     output_dim = get_output_dim(encoder)
+    #     indexes = np.arange(1, len(self.labels) + 1)
+    #     n_samples = len(indexes)
+    #     n_batches = n_samples / batch_size
+    #     n_batches += 1 if (n_batches * batch_size) != n_samples else 0
+    #     progress_bar = IncrementalBar(
+    #         'Precomputing',
+    #         max=n_batches,
+    #         suffix='%(percent).1f%% - %(eta)ds')
+    #     precomputed = {}
+    #
+    #     for batch_no in xrange(n_batches):
+    #         start = batch_no * batch_size
+    #         end = min((batch_no + 1) * batch_size, n_samples)
+    #         batch_indexes = indexes[start:end]
+    #         size = end - start
+    #
+    #         batch = np.empty([size] + self.image_shape)
+    #         for i, img_index in enumerate(batch_indexes):
+    #             batch[i] = self.load_image(img_index)
+    #         transformed = encoder.predict_on_batch(batch)
+    #
+    #         for i, img_index in enumerate(batch_indexes):
+    #             precomputed[img_index] = transformed[i]
+    #
+    #         progress_bar.next()
+    #
+    #     return InfiniteImageLoadingGenerator(
+    #         batch_size=self.batch_size,
+    #         indexes=self.indexes,
+    #         labels=self.orig_labels,
+    #         images_base_path=self.images_base_path,
+    #         image_file_fmt=self.image_file_fmt,
+    #         shuffle_on_exhaust=self.shuffle_on_exhaust,
+    #         cat_thresholds=self.cat_thresholds,
+    #         pctl_sampling=self.pctl_sampling,
+    #         pctl_thresholds=self.pctl_thresholds,
+    #         timesteps=self.timesteps,
+    #         timestep_delta=self.timestep_delta,
+    #         precomputed=precomputed,
+    #         scale=self.scale,
+    #         concat_original=self.concat_original)
 
-        @param timesteps - number of previous labels to append to samples
-        @return - image-loading iterator with prev image timesteps
-        """
-        return InfiniteImageLoadingGenerator(
-            batch_size=self.batch_size,
-            indexes=self.indexes,
-            labels=self.orig_labels,
-            images_base_path=self.images_base_path,
-            image_file_fmt=self.image_file_fmt,
-            shuffle_on_exhaust=self.shuffle_on_exhaust,
-            cat_thresholds=self.cat_thresholds,
-            pctl_sampling=self.pctl_sampling,
-            pctl_thresholds=self.pctl_thresholds,
-            timesteps=timesteps,
-            timestep_delta=timestep_delta,
-            precomputed=self.precomputed,
-            scale=self.scale,
-            concat_original=self.concat_original)
-
-    def precompute_transform(self, transform_model):
-        """
-        Precompute an encoder transform on the whole dataset and load
-        it into memory.
-
-        @param transform_model- model supporting predict_on_batch
-        @return - imag-loading iterator with precomputed transformed input
-        """
-        encoder = transform_model.as_encoder()
-        batch_size = self.batch_size
-        output_dim = get_output_dim(encoder)
-        indexes = np.arange(1, len(self.labels) + 1)
-        n_samples = len(indexes)
-        n_batches = n_samples / batch_size
-        n_batches += 1 if (n_batches * batch_size) != n_samples else 0
-        progress_bar = IncrementalBar(
-            'Precomputing',
-            max=n_batches,
-            suffix='%(percent).1f%% - %(eta)ds')
-        precomputed = {}
-
-        for batch_no in xrange(n_batches):
-            start = batch_no * batch_size
-            end = min((batch_no + 1) * batch_size, n_samples)
-            batch_indexes = indexes[start:end]
-            size = end - start
-
-            batch = np.empty([size] + self.image_shape)
-            for i, img_index in enumerate(batch_indexes):
-                batch[i] = self.load_image(img_index)
-            transformed = encoder.predict_on_batch(batch)
-
-            for i, img_index in enumerate(batch_indexes):
-                precomputed[img_index] = transformed[i]
-
-            progress_bar.next()
-
-        return InfiniteImageLoadingGenerator(
-            batch_size=self.batch_size,
-            indexes=self.indexes,
-            labels=self.orig_labels,
-            images_base_path=self.images_base_path,
-            image_file_fmt=self.image_file_fmt,
-            shuffle_on_exhaust=self.shuffle_on_exhaust,
-            cat_thresholds=self.cat_thresholds,
-            pctl_sampling=self.pctl_sampling,
-            pctl_thresholds=self.pctl_thresholds,
-            timesteps=self.timesteps,
-            timestep_delta=self.timestep_delta,
-            precomputed=precomputed,
-            scale=self.scale,
-            concat_original=self.concat_original)
 
     def with_precomputed(self, precomputed):
         return InfiniteImageLoadingGenerator(
@@ -481,6 +523,31 @@ class InfiniteImageLoadingGenerator(object):
 
         return self.current_index
 
+    def get_index_sample(self, batch_size, label_idx):
+        return np.random.choice(label_idx, batch_size)
+
+    def __next__(self):
+        labels = np.empty([self.batch_size] + self.label_shape)
+        samples = np.empty([self.batch_size] + self.image_shape)
+        next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        #next_indexes = [self.indexes[self.incr_index()] for _ in xrange(self.batch_size)]
+        for i, next_image_index in enumerate(next_indexes):
+            next_label_index = next_image_index - 1
+            labels[i] = self.labels[next_label_index]
+            samples[i] = self.load_image(next_image_index)
+        return (samples, labels)
+
+    def next(self):
+        labels = np.empty([self.batch_size] + self.label_shape)
+        samples = np.empty([self.batch_size] + self.image_shape)
+        next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        #next_indexes = [self.indexes[self.incr_index()] for _ in xrange(self.batch_size)]
+        for i, next_image_index in enumerate(next_indexes):
+            next_label_index = next_image_index - 1
+            labels[i] = self.labels[next_label_index]
+            samples[i] = self.load_image(next_image_index)
+        return (samples, labels)
+'''
     def __next__(self):
         labels = np.empty([self.batch_size] + self.label_shape)
         if self.timesteps is not None:
@@ -537,9 +604,9 @@ class InfiniteImageLoadingGenerator(object):
             return ([samples, originals_np], labels)
         else:
             return (samples, labels)
+'''
 
-
-
+'''
     def next(self):
         labels = np.empty([self.batch_size] + self.label_shape)
         if self.timesteps is not None:
@@ -596,6 +663,7 @@ class InfiniteImageLoadingGenerator(object):
             return ([samples, originals_np], labels)
         else:
             return (samples, labels)
+'''
 
 def load_image(index, images_base_path, image_file_fmt):
     """
@@ -635,7 +703,8 @@ def load_dataset(dataset_path):
 
     # Load the dataset from the local directory
     labels = np.load(os.path.join(dataset_path, 'labels.npy'))
-
+    rmse_test = np.sqrt(np.mean(np.square(labels)))
+    print(rmse_test, "loaded labels rmse")
     training_indexes = (np
         .load(os.path.join(dataset_path, 'training_indexes.npy'))
         .astype(int))
@@ -662,6 +731,65 @@ def load_dataset(dataset_path):
         testing_indexes=testing_indexes,
         validation_indexes=validation_indexes,
         image_file_fmt=image_file_fmt)
+#testing_indexes
+#validation_indexes
+
+def load_dataset_new(dataset_path_training, dataset_path_validation):
+    """
+    Downloads and loads an image dataset.
+
+    A dataset directory should have this structure:
+      /
+          training_indexes.npy
+          testing_indexes.npy
+          validation_indexes.npy
+          labels.npy
+          images/
+              1.png.npy
+              2.png.npy
+              ...
+              N.png.npy
+
+    @param dataset_path - path to dataset directory
+    """
+    assert(os.path.exists(dataset_path_training),
+           "dataset doesn't exist: " + dataset_path_training)
+
+    # Load the dataset from the local directory
+    labels = np.load(os.path.join(dataset_path_training, 'training_center_labels.npy'))
+    rmse_test = np.sqrt(np.mean(np.square(labels)))
+    print(rmse_test, "loaded labels rmse")
+    training_indexes = (np
+        .load(os.path.join(dataset_path_training, 'training_center_indexes.npy'))
+        .astype(int))
+    testing_indexes = (np
+        .load(os.path.join(dataset_path_validation, 'validation_center_indexes.npy'))
+        .astype(int))
+    validation_indexes = (np
+        .load(os.path.join(dataset_path_validation, 'validation_center_indexes.npy'))
+        .astype(int))
+    validation_labels = np.load(os.path.join(dataset_path_validation, 'validation_center_labels.npy'))
+
+    images_base_path = os.path.join(dataset_path_training, 'images\\center')
+    images_base_path_val = os.path.join(dataset_path_validation, 'images\\center')
+
+    # hack png vs jpg; DWIM
+    try:
+        load_image(1, images_base_path, '%d.png.npy')
+        image_file_fmt = '%d.png.npy'
+    except:
+        image_file_fmt = '%d.jpg.npy'
+    image_file_fmt = '%d.jpg.npy'
+
+    return Dataset(
+        images_base_path=images_base_path,
+        labels=labels,
+        training_indexes=training_indexes,
+        testing_indexes=testing_indexes,
+        validation_indexes=validation_indexes,
+        image_file_fmt=image_file_fmt, validation_labels=validation_labels, validation_base_path=dataset_path_validation, images_base_path_val=images_base_path_val)
+#testing_indexes
+#validation_indexes
 
 
 def prepare_dataset(

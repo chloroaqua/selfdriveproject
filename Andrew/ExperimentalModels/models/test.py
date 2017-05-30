@@ -27,21 +27,25 @@ def make_np_data(input_path, output_path, cam_location, type):
     labels = np.empty(n_original_samples)
 
     indexes = np.arange(0, n_original_samples)
-    np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
-    np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
+    #np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
+    #np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
     for image_index, (_, row) in enumerate(master_df.iterrows()):
         if image_index % 1000 == 0:
             print(image_index)
         # print(image_index, row)
         current_out_filename = os.path.join(images_output_path, '%d.jpg.npy' % image_index)
-        labels[image_index] = row.angle
+        angle = row.angle
+        labels[image_index] = angle
         current_image = os.path.join(input_path, str(row.filename))
         cv_image = cv2.imread(current_image)
         cv_image = cv2.resize(cv_image, (320, 240))
-        # cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
+        cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
+        cv_image = cv_image[120:240, :, :]
         #print(current_out_filename)
         np.save(current_out_filename, cv_image)
         #plt.imshow(cv_image)
+    np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
+    np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
 
     #np.save(os.path.join(output_path, 'labels_{}_{}.npy'.format(type, cam_location)), labels)
 
@@ -49,7 +53,7 @@ make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\S
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "left", "training")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "right", "training")
 
-#make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "center", "validation")
+make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "center", "validation")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "left", "validation")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "right", "validation")
 
