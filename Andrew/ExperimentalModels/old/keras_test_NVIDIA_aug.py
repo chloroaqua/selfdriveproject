@@ -1,16 +1,10 @@
-import numpy as np
-import tensorflow as tf
-import keras
 import os
-import matplotlib.pyplot as plt
-from keras.layers import Conv2D, MaxPooling2D, SpatialDropout2D, Flatten, Dropout, Dense, BatchNormalization
-from keras.losses import mean_squared_error
+
+import numpy as np
+from keras.layers import Conv2D, Flatten, Dense
 from keras.models import Sequential
-from keras.optimizers import Adam, SGD
-from keras.regularizers import l2
 
-import keras_help
-
+from old import keras_help
 
 training_dataset_path = "M:\\selfdrive\\SelfDrivingData\\test_out2\\training"
 training_labels_center = np.load(os.path.join(training_dataset_path, 'training_center_labels.npy'))
@@ -72,10 +66,11 @@ model.compile(loss='mean_squared_error', optimizer='adam', metrics=[keras_help.r
 print(keras_help.std_evaluate(model, keras_help.generate_arrays_from_file_new(validation_labels, validation_index_center, image_base_path_validation, 32), 32))
 
 
-model.fit_generator(keras_help.generate_arrays_from_file_new_augment_light(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1),
-                    steps_per_epoch=training_labels_center.shape[0] // 32,
-                    validation_data=keras_help.generate_arrays_from_file_new(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1),
-                    validation_steps=validation_labels.shape[0] // 32, epochs=40, verbose=1)
+model.fit_generator(
+    keras_help.generate_arrays_from_file_new_augment_light(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1),
+    steps_per_epoch=training_labels_center.shape[0] // 32,
+    validation_data=keras_help.generate_arrays_from_file_new(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1),
+    validation_steps=validation_labels.shape[0] // 32, epochs=40, verbose=1)
 
 '''
 

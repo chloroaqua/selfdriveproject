@@ -1,16 +1,10 @@
-import numpy as np
-import tensorflow as tf
-import keras
 import os
-import matplotlib.pyplot as plt
-from keras.layers import Conv2D, MaxPooling2D, SpatialDropout2D, Flatten, Dropout, Dense, BatchNormalization
-from keras.losses import mean_squared_error
+
+import numpy as np
+from keras.layers import Conv2D, Flatten, Dense
 from keras.models import Sequential
-from keras.optimizers import Adam, SGD
-from keras.regularizers import l2
 
-import keras_help
-
+from old import keras_help
 
 training_dataset_path = "M:\\selfdrive\\SelfDrivingData\\test_out2\\training"
 training_labels_center = np.load(os.path.join(training_dataset_path, 'training_center_labels.npy'))

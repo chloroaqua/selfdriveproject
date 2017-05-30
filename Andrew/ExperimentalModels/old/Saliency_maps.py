@@ -1,27 +1,15 @@
-import numpy as np
-import tensorflow as tf
-import keras
 import os
-import matplotlib.pyplot as plt
-from keras.layers import Conv2D, MaxPooling2D, SpatialDropout2D, Flatten, Dropout, Dense, BatchNormalization
-from keras.losses import mean_squared_error
-from keras.models import Sequential, load_model, model_from_json
-from keras.optimizers import Adam, SGD
-from keras.regularizers import l2
-
-import keras_help
-import numpy as np
-from matplotlib import pyplot as plt
-
-from keras.preprocessing.image import img_to_array
-from keras.applications.imagenet_utils import preprocess_input
-
-from vis.utils import utils
-from vis.utils.vggnet import VGG16
-from vis.visualization import visualize_saliency
 
 import cv2
-model = load_model('nvidia_aug_v4_light_v2.h5', custom_objects={'rmse': keras_help.rmse})
+import numpy as np
+from keras.models import load_model
+from matplotlib import pyplot as plt
+from vis.utils import utils
+from vis.visualization import visualize_saliency
+
+from old import keras_help
+
+model = load_model('nvidia_no_aug_v2.h5', custom_objects={'rmse': keras_help.rmse})
 #model = model_from_json(open('nvidia_no_aug.h5').read())
 #model.load_weights(os.path.join(os.path.dirname('nvidia_no_aug'), 'model_weights.h5'))
 
@@ -49,6 +37,7 @@ image_pro = image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
 x = ((image-(255.0/2))/255.0)
 pred_value = model.predict(np.reshape(x, (1,120,320,3)))
 heatmap = visualize_saliency(model, 1, [11], image)
+print(training_labels_center[10000])
 plt.imshow(heatmap)
 
 print(keras_help.std_evaluate(model, keras_help.generate_arrays_from_file_new(validation_labels, validation_index_center, image_base_path_validation, 32), 32))

@@ -1,9 +1,8 @@
-import numpy as np
-import tensorflow as tf
-import keras
 import os
-import matplotlib.pyplot as plt
-import keras_help
+
+import numpy as np
+
+from old import keras_help
 
 dataset_path = "M:\\selfdrive\\SelfDrivingData\\test_out2\\training"
 labels = np.load(os.path.join(dataset_path, 'training_center_indexes_labels.npy'))

@@ -1,16 +1,9 @@
-import numpy as np
-import tensorflow as tf
-import keras
 import os
-import matplotlib.pyplot as plt
-from keras.layers import Conv2D, MaxPooling2D, SpatialDropout2D, Flatten, Dropout, Dense, BatchNormalization
-from keras.losses import mean_squared_error
-from keras.models import Sequential, load_model, model_from_json
-from keras.optimizers import Adam, SGD
-from keras.regularizers import l2
 
-import keras_help
+import numpy as np
+from keras.models import load_model
 
+from old import keras_help
 
 model = load_model('nvidia_aug_v4_light_v2.h5', custom_objects={'rmse': keras_help.rmse})
 #model = model_from_json(open('nvidia_no_aug.h5').read())
