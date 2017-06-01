@@ -1,3 +1,4 @@
+import keras
 import numpy as np
 import os
 import scipy.ndimage
@@ -210,7 +211,7 @@ def generate_arrays_from_file_new_3d(labels, index_values, image_path_base, batc
             idx = np.random.choice(value_range, 1)
             for j in range(number_of_frames):
                 y = labels[idx+j]
-                image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx])))
+                image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx+j])))
                 image = np.load(image_path)
                 flip_bit = random.randint(0, 1)
                 if flip_bit == 1:
@@ -223,7 +224,66 @@ def generate_arrays_from_file_new_3d(labels, index_values, image_path_base, batc
 
 
         yield batch_features, batch_labels
+
+
+def generate_arrays_from_file_new_3d_seq(labels, index_values, image_path_base, batch_size, scale=1.0, number_of_frames=1, seq_length=1):
+    batch_features = np.zeros((batch_size, seq_length, number_of_frames, 120, 320, 3))
+    batch_labels = np.zeros((batch_size, seq_length, 1))
+    value_range = np.arange(0, len(labels)-number_of_frames-seq_length-1)
+    while True:
+        for batch_i in range(batch_size):
+            idx = np.random.choice(value_range, 1)
+            for seq in range(seq_length):
+                for frame in range(number_of_frames):
+                    y = labels[idx + frame + seq]
+                    image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx + frame + seq])))
+                    image = np.load(image_path)
+                    flip_bit = random.randint(0, 1)
+                    if flip_bit == 1:
+                        image = np.flip(image, 1)
+                        y = y * -1
+                    image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+                    image = ((image - (255.0 / 2)) / 255.0)
+                    batch_features[batch_i, seq, frame, :] = image
+                    batch_labels[batch_i, seq, :] = y * scale
+
+        yield batch_features, batch_labels
+
+
+
+def generate_arrays_from_file_new_3d_with_diff(labels, index_values, image_path_base, batch_size, scale=1.0, number_of_frames=1):
+    batch_features = np.zeros((batch_size, number_of_frames, 120, 320, 3))
+    batch_labels = np.zeros((batch_size, 1))
+    value_range = np.arange(1,len(labels)-number_of_frames-1)
+    while True:
+        for i in range(batch_size):
+            idx = np.random.choice(value_range, 1)
+            for j in range(number_of_frames):
+                y = labels[idx+j]
+                y_prev = labels[idx + j -1]
+                image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx])))
+                image = np.load(image_path)
+                image_path_prev = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx-1])))
+                image_prev = np.load(image_path_prev)
+                flip_bit = random.randint(0, 1)
+                if flip_bit == 1:
+                    image = np.flip(image, 1)
+                    y = y * -1
+                    image_prev = np.flip(image_prev, 1)
+                    y_prev = y_prev * -1
+                image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+                image = ((image - (255.0 / 2)) / 255.0)
+
+                image_prev[:, :, 0] = cv2.equalizeHist(image_prev[:, :, 0])
+                image_prev = ((image_prev - (255.0 / 2)) / 255.0)
+
+                batch_features[i, j, :] = image - image_prev
+                batch_labels[i] = y * scale
+
+
+        yield batch_features, batch_labels
         #f.close()
+
 
 
 def image_convert(image):
@@ -231,11 +291,12 @@ def image_convert(image):
     image_out = cv2.cvtColor(image_out, cv2.COLOR_YUV2BGR)
     return image_out
 
-def get_images(start_image_path, number_of_frames):
+def get_images(start_image_path, number_of_frames, start):
     data = np.zeros((1, number_of_frames, 120, 320, 3))
     image_copies = np.zeros((1, number_of_frames, 120, 320, 3))
     for i in range(number_of_frames):
-        image = np.load(start_image_path)
+        image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start+i))
+        image = np.load(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
         image = image.astype('uint8')
         image_copy = np.copy(image)
@@ -245,5 +306,26 @@ def get_images(start_image_path, number_of_frames):
         data[0, i, :] = x
     return data, image_copies
 
+def get_images_seq(start_image_path, number_of_frames, seq_length, start):
+    data = np.zeros((1, seq_length, number_of_frames, 120, 320, 3))
+    image_copies = np.zeros((1, seq_length, number_of_frames, 120, 320, 3))
+    for seq in range(seq_length):
+        for i in range(number_of_frames):
+            image = np.load(start_image_path)
+            image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
+            image = image.astype('uint8')
+            image_copy = np.copy(image)
+            image_copies[0, i, :] = image_copy
+            image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+            x = ((image - (255.0 / 2)) / 255.0)
+            data[0, i, :] = x
+
+    return data, image_copies
 
 
+class LossHistory(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.losses = []
+
+    def on_batch_end(self, batch, logs={}):
+        self.losses.append(logs.get('loss'))
