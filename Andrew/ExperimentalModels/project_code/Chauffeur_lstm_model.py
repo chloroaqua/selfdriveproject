@@ -49,9 +49,9 @@ model.add(TimeDistributed(Conv2D(128, 3, 3,
                                         subsample=(1, 2),
                                         border_mode='valid')))
 model.add(TimeDistributed(Flatten()))
-model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True))
-model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True))
-model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2))
+model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True, implementation=2))
+model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, return_sequences=True, implementation=2))
+model.add(LSTM(64, dropout_W=0.2, dropout_U=0.2, implementation=2))
 model.add(Dropout(0.2))
 model.add(Dense(
     output_dim=256,
@@ -64,10 +64,12 @@ model.add(Dense(
     init='he_normal',
     W_regularizer=l2(0.001)))
 
+model.load_weights("../models/tmp/chauffeur_lstm_check.hdf5")
+
 model.compile(loss='mean_squared_error', optimizer='adadelta', metrics=[util.rmse])
 
 #Check a batch to see the base of the model
-print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d(validation_labels, validation_index_center, image_base_path_validation, 32, number_of_frames=num_frames), validation_index_center.shape[0]//32))
+#print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d(validation_labels, validation_index_center, image_base_path_validation, 32, number_of_frames=num_frames), validation_index_center.shape[0]//32))
 history = util.LossHistory()
 checkpointer = ModelCheckpoint(filepath="../models/tmp/chauffeur_lstm_check.hdf5", verbose=1, save_best_only=True)
 model.summary()

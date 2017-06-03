@@ -92,8 +92,8 @@ def add_random_shadow(image):
     image = cv2.cvtColor(image_hls,cv2.COLOR_HLS2RGB)
     return image
 
-def generate_arrays_from_file_new(labels, index_values, image_path_base, batch_size, scale=1.0, random_flip=False):
-    batch_features = np.zeros((batch_size, 120, 320, 3))
+def generate_arrays_from_file_new(labels, index_values, image_path_base, batch_size, scale=1.0, random_flip=False, input_shape=(120, 320, 3)):
+    batch_features = np.zeros((batch_size, *input_shape))
     batch_labels = np.zeros((batch_size, 1))
     while True:
         next_indexes = np.random.choice(np.arange(0, len(index_values)), batch_size)
@@ -204,8 +204,8 @@ def generate_arrays_from_file_new_augment_aggressive(labels, index_values, image
         #f.close()
 
 
-def generate_arrays_from_file_new_3d(labels, index_values, image_path_base, batch_size, scale=1.0, number_of_frames=1, random_flip=False):
-    batch_features = np.zeros((batch_size, number_of_frames, 120, 320, 3))
+def generate_arrays_from_file_new_3d(labels, index_values, image_path_base, batch_size, scale=1.0, number_of_frames=1, random_flip=False, input_shape=(120,320,3)):
+    batch_features = np.zeros((batch_size, number_of_frames, *input_shape))
     batch_labels = np.zeros((batch_size, 1))
     value_range = np.arange(0,len(labels)-number_of_frames-1)
     while True:
@@ -333,3 +333,10 @@ class LossHistory(keras.callbacks.Callback):
 
     def on_batch_end(self, batch, logs={}):
         self.losses.append(logs.get('loss'))
+
+def step_decay(epoch):
+    initial_lrate = 0.001
+    drop = 0.5
+    epochs_drop = 10.0
+    lrate = initial_lrate * np.math.pow(drop, np.math.floor((1 + epoch) / epochs_drop))
+    return lrate
