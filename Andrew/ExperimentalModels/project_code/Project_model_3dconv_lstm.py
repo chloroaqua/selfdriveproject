@@ -5,7 +5,8 @@ import numpy as np
 from keras import Input
 from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from keras.engine import Model
-from keras.layers import Conv2D, Flatten, Dense, Conv3D, BatchNormalization, LSTM, TimeDistributed, MaxPooling3D
+from keras.layers import Conv2D, Flatten, Dense, Conv3D, BatchNormalization, LSTM, TimeDistributed, MaxPooling3D, \
+    AveragePooling3D
 from keras.models import Sequential
 import matplotlib.pyplot as plt
 from keras.optimizers import Adam
@@ -32,7 +33,7 @@ print(rmse_test)
 
 
 seq_frames = 5
-num_seqs = 4
+num_seqs = 5
 
 
 xin = Input(batch_shape=(32, num_seqs, seq_frames, 120, 320, 3))
@@ -44,7 +45,7 @@ print(cs._keras_shape, "bn1")
 cs = TimeDistributed(MaxPooling3D(pool_size=(1, 2, 2)))(cs)
 cs = TimeDistributed(MaxPooling3D(pool_size=(1, 2, 2)))(cs)
 
-for i in range(8):
+for i in range(2):
     c = TimeDistributed(Conv3D(64, (3, 3, 3), strides=(1, 1, 1), activation='relu', use_bias=True, padding='SAME'))(cs)
     bn1 = BatchNormalization(axis=4)(c)
     print(bn1._keras_shape, "bn1a")
@@ -55,13 +56,13 @@ for i in range(8):
     print(cs._keras_shape, "res_block{}".format(i))
 
 for i in range(3):
-    c = TimeDistributed(Conv3D(16, (3, 3, 3), strides=(1, 2, 2), activation='relu', use_bias=True, padding='SAME'))(cs)
+    c = TimeDistributed(Conv3D(8, (3, 3, 3), strides=(1, 2, 2), activation='relu', use_bias=True, padding='SAME'))(cs)
     cs = BatchNormalization(axis=4)(c)
     print(cs._keras_shape, "shrink_block{}".format(i))
 
 
+#cs = TimeDistributed(AveragePooling3D(pool_size=(1, 2, 2)))(cs)
 #cs = TimeDistributed(MaxPooling3D(pool_size=(1, 2, 2)))(cs)
-# cs = TimeDistributed(MaxPooling3D(pool_size=(1, 2, 2)))(cs)
 
 
 flt = TimeDistributed(Flatten())(cs)
@@ -94,7 +95,7 @@ model.summary()
 
 history = util.LossHistory()
 lrate = LearningRateScheduler(util.step_decay)
-checkpointer = ModelCheckpoint(filepath="3d_only_check_check.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="project_model_3dconv_lstm_check.hdf5", verbose=1, save_best_only=True)
 # model = Sequential()
 # model.add(TimeDistributed(Conv3D(24, (3, 3, 3), strides=(2, 2, 2), activation='relu', use_bias=True, padding='SAME'), input_shape=(num_seqs, seq_frames, 120, 320, 3)))
 # #model.add(TimeDistributed(Conv2D(24, (5, 5), strides=2, activation='relu'), input_shape=(num_frames, 120, 320, 3)))
@@ -126,4 +127,4 @@ model.fit_generator(util.generate_arrays_from_file_new_3d_seq(training_labels_ce
                     validation_data=util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
                     validation_steps=validation_labels.shape[0] // 32, epochs=32, verbose=1, callbacks=[history, checkpointer, lrate])
 
-model.save('../models/3d_test_seq_v1.h5')
+model.save('../models/project_model_3dconv_lstm.h5')
