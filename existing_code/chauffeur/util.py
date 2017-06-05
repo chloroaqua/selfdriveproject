@@ -1,5 +1,8 @@
 import logging, os, subprocess, sys, tempfile, time
+import random
 
+import cv2
+import numpy as np
 logger = logging.getLogger(__name__)
 
 
@@ -107,3 +110,26 @@ def download_dir(s3_uri, local_path):
 
     finally:
         os.remove(tmp_path)
+
+
+def generate_arrays_from_file_new(labels, index_values, image_path_base, batch_size, scale=1.0, random_flip=False):
+    batch_features = np.zeros((batch_size, 120, 320, 3))
+    batch_labels = np.zeros((batch_size, 1))
+    while True:
+        next_indexes = np.random.choice(np.arange(0, len(index_values)), batch_size)
+        for i, idx in enumerate(next_indexes):
+            #idx = np.random.choice(len(labels), 1)
+            y = labels[idx]
+            image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx])))
+            image = np.load(image_path)
+            if random_flip:
+                flip_bit = random.randint(0, 1)
+                if flip_bit == 1:
+                    image = np.flip(image, 1)
+                    y = y * -1
+            image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+            image = ((image-(255.0/2))/255.0)
+            batch_features[i, :] = image
+            batch_labels[i] = y * scale
+        yield batch_features, batch_labels
+        #f.close()

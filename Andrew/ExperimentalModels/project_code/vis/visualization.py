@@ -167,7 +167,7 @@ def visualize_saliency(model, layer_idx, filter_indices,
     # Create jet heatmap.
     heatmap = np.uint8(cm.jet(grads)[..., :3] * 255)
     heatmap = np.uint8(seed_img * alpha + heatmap * (1. - alpha))
-    return heatmap[0]
+    return heatmap[0], grads
 
 
 def visualize_cam(model, layer_idx, filter_indices,

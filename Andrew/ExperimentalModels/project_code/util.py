@@ -44,6 +44,28 @@ def std_evaluate(model, generator, size):
     mse = err_sum / err_count
     return [mse, np.sqrt(mse)]
 
+def std_evaluate_seq(model, generator, size, seq_size):
+    """
+    """
+    #size = generator.get_size()
+    #batch_size = generator.get_batch_size()
+    #n_batches = size // batch_size
+    print("std test")
+
+    err_sum = 0.
+    err_count = 0.
+    count = 0
+    for data in generator:
+        count += 1
+        X_batch, y_batch = data
+        y_pred = model.predict_on_batch(X_batch)
+        err_sum += np.sum((y_batch - y_pred) ** 2)
+        err_count += len(y_pred)
+        if count == size:
+            break
+
+    mse = err_sum / err_count
+    return [mse, np.sqrt(mse)]
 
 #https://chatbotslife.com/using-augmentation-to-mimic-human-driving-496b569760a9
 def augment_brightness_camera_images(image):
@@ -80,7 +102,7 @@ def add_random_shadow(image):
     X_m = np.mgrid[0:image.shape[0],0:image.shape[1]][0]
     Y_m = np.mgrid[0:image.shape[0],0:image.shape[1]][1]
     shadow_mask[((X_m-top_x)*(bot_y-top_y) -(bot_x - top_x)*(Y_m-top_y) >=0)]=1
-    #random_bright = .25+.7*np.random.uniform()
+    random_bright = .25+.7*np.random.uniform()
     if np.random.randint(2)==1:
         random_bright = .5
         cond1 = shadow_mask==1
@@ -295,6 +317,24 @@ def image_convert(image):
     image_out = cv2.cvtColor(image_out, cv2.COLOR_YUV2BGR)
     return image_out
 
+
+def get_images_single(start_image_path, start):
+    data = np.zeros((1, 120, 320, 3))
+    image_copies = np.zeros((1, 120, 320, 3))
+    image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start))
+    image = np.load(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
+    image = image.astype('uint8')
+    image_copy = np.copy(image)
+    image_copies[0, :] = image_copy
+    image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+    x = ((image - (255.0 / 2)) / 255.0)
+    data[0, :] = x
+
+    return data, image_copies
+
+
+
 def get_images(start_image_path, number_of_frames, start):
     data = np.zeros((1, number_of_frames, 120, 320, 3))
     image_copies = np.zeros((1, number_of_frames, 120, 320, 3))
@@ -315,7 +355,8 @@ def get_images_seq(start_image_path, number_of_frames, seq_length, start):
     image_copies = np.zeros((1, seq_length, number_of_frames, 120, 320, 3))
     for seq in range(seq_length):
         for i in range(number_of_frames):
-            image = np.load(start_image_path)
+            image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start + i))
+            image = np.load(image_path)
             image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
             image = image.astype('uint8')
             image_copy = np.copy(image)
@@ -326,6 +367,20 @@ def get_images_seq(start_image_path, number_of_frames, seq_length, start):
 
     return data, image_copies
 
+def get_images_single_res(start_image_path, start):
+    data = np.zeros((1, 224, 224, 3))
+    image_copies = np.zeros((1, 224, 224, 3))
+    image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start))
+    image = np.load(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
+    image = image.astype('uint8')
+    image_copy = np.copy(image)
+    image_copies[0, :] = image_copy
+    image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+    x = ((image - (255.0 / 2)) / 255.0)
+    data[0, :] = x
+
+    return data, image_copies
 
 class LossHistory(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):

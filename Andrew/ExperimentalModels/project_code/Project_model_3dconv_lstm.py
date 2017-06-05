@@ -7,7 +7,7 @@ from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from keras.engine import Model
 from keras.layers import Conv2D, Flatten, Dense, Conv3D, BatchNormalization, LSTM, TimeDistributed, MaxPooling3D, \
     AveragePooling3D
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 import matplotlib.pyplot as plt
 from keras.optimizers import Adam
 
@@ -36,7 +36,7 @@ seq_frames = 5
 num_seqs = 5
 
 
-xin = Input(batch_shape=(32, num_seqs, seq_frames, 120, 320, 3))
+xin = Input(shape=(num_seqs, seq_frames, 120, 320, 3))
 c = TimeDistributed(Conv3D(3, (3, 3, 3), strides=(1, 3, 3), activation='relu', use_bias=True, padding='SAME'))(xin)
 print(c._keras_shape, "con3d1")
 cs = BatchNormalization(axis=4)(c)
@@ -71,20 +71,19 @@ lstm1 = LSTM(64, activation='tanh', return_sequences=True, implementation=2)(flt
 print(lstm1._keras_shape, "lstm1")
 lstm2 = LSTM(16,  activation='tanh', return_sequences=True, implementation=2)(lstm1)
 print(lstm2._keras_shape, "lstm2")
-dense1 = TimeDistributed(Dense(512))(lstm2)
-print(dense1._keras_shape, "dense1")
-d = TimeDistributed(Dense(512, activation='relu'))(dense1)
+d = TimeDistributed(Dense(512))(lstm2)
+print(d._keras_shape, "dense1")
 d = TimeDistributed(Dense(128, activation='relu'))(d)
 d = TimeDistributed(Dense(64, activation='relu'))(d)
 d = TimeDistributed(Dense(16, activation='relu'))(d)
-angle = TimeDistributed(Dense(1))(dense1)
+angle = TimeDistributed(Dense(1))(d)
 model = Model(inputs=xin, outputs=angle)
 
 learning_rate = 0.001
 decay_rate = learning_rate / 32
 optimizer = Adam(lr=learning_rate, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=decay_rate)
 
-#model.load_weights("3d_only_check_check.hdf5")
+model.load_weights("project_model_3dconv_lstm_check.hdf5")
 model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=[util.rmse])
 
 learning_rate = 0.001
@@ -95,7 +94,7 @@ model.summary()
 
 history = util.LossHistory()
 lrate = LearningRateScheduler(util.step_decay)
-checkpointer = ModelCheckpoint(filepath="project_model_3dconv_lstm_check.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="project_model_3dconv_lstm_check_new.hdf5", verbose=1, save_best_only=True)
 # model = Sequential()
 # model.add(TimeDistributed(Conv3D(24, (3, 3, 3), strides=(2, 2, 2), activation='relu', use_bias=True, padding='SAME'), input_shape=(num_seqs, seq_frames, 120, 320, 3)))
 # #model.add(TimeDistributed(Conv2D(24, (5, 5), strides=2, activation='relu'), input_shape=(num_frames, 120, 320, 3)))
@@ -121,10 +120,14 @@ checkpointer = ModelCheckpoint(filepath="project_model_3dconv_lstm_check.hdf5", 
 # model.compile(loss='mean_squared_error', optimizer='adam', metrics=[util.rmse])
 #
 
+#training_labels_center.shape[0] // 32
+#validation_labels.shape[0] // 32
+print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 16, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 64))
 
 model.fit_generator(util.generate_arrays_from_file_new_3d_seq(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
-                    steps_per_epoch=training_labels_center.shape[0] // 32,
+                    steps_per_epoch=10,
                     validation_data=util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
-                    validation_steps=validation_labels.shape[0] // 32, epochs=32, verbose=1, callbacks=[history, checkpointer, lrate])
+                    validation_steps=10, epochs=1, verbose=1, callbacks=[history, checkpointer, lrate])
 
-model.save('../models/project_model_3dconv_lstm.h5')
+model.save('../models/project_model_3dconv_lstm_best.h5')
+print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 32))

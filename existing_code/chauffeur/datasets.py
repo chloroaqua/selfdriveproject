@@ -527,23 +527,31 @@ class InfiniteImageLoadingGenerator(object):
         return np.random.choice(label_idx, batch_size)
 
     def __next__(self):
-        labels = np.empty([self.batch_size] + self.label_shape)
-        samples = np.empty([self.batch_size] + self.image_shape)
-        next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        #labels = np.empty([self.batch_size] + self.label_shape)
+        #samples = np.empty([self.batch_size] + self.image_shape)
+        samples = np.zeros((self.batch_size, *self.image_shape))
+        labels = np.zeros((self.batch_size, *self.label_shape))
+        #next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        next_indexes = self.get_index_sample(self.batch_size, np.arange(0, len(self.indexes)))
         #next_indexes = [self.indexes[self.incr_index()] for _ in xrange(self.batch_size)]
         for i, next_image_index in enumerate(next_indexes):
-            next_label_index = next_image_index - 1
+            #next_label_index = next_image_index - 1
+            next_label_index = next_image_index
             labels[i] = self.labels[next_label_index]
             samples[i] = self.load_image(next_image_index)
         return (samples, labels)
 
     def next(self):
-        labels = np.empty([self.batch_size] + self.label_shape)
-        samples = np.empty([self.batch_size] + self.image_shape)
-        next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        #labels = np.empty([self.batch_size] + self.label_shape)
+        #samples = np.empty([self.batch_size] + self.image_shape)
+        samples = np.zeros((self.batch_size, *self.image_shape))
+        labels = np.zeros((self.batch_size, *self.label_shape))
+        #next_indexes = self.get_index_sample(self.batch_size, np.arange(1, len(self.indexes)))
+        next_indexes = self.get_index_sample(self.batch_size, np.arange(0, len(self.indexes)))
         #next_indexes = [self.indexes[self.incr_index()] for _ in xrange(self.batch_size)]
         for i, next_image_index in enumerate(next_indexes):
-            next_label_index = next_image_index - 1
+            #next_label_index = next_image_index - 1
+            next_label_index = next_image_index
             labels[i] = self.labels[next_label_index]
             samples[i] = self.load_image(next_image_index)
         return (samples, labels)

@@ -38,9 +38,10 @@ def make_np_data(input_path, output_path, cam_location, type):
         labels[image_index] = angle
         current_image = os.path.join(input_path, str(row.filename))
         cv_image = cv2.imread(current_image)
-        cv_image = cv2.resize(cv_image, (320, 240))
+        #cv_image = cv2.resize(cv_image, (320, 240))
+        cv_image = cv2.resize(cv_image, (224, 224))
         cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
-        cv_image = cv_image[120:240, :, :]
+        #cv_image = cv_image[120:240, :, :]
         #print(current_out_filename)
         np.save(current_out_filename, cv_image)
         #plt.imshow(cv_image)

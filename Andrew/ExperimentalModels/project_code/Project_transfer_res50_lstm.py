@@ -69,14 +69,14 @@ model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=[util.rmse
 
 history = util.LossHistory()
 lrate = LearningRateScheduler(util.step_decay)
-checkpointer = ModelCheckpoint(filepath="../models/tmp/res50_trans_net_test_check.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="../models/tmp/res50_trans_net_test_check_new.hdf5", verbose=1, save_best_only=True)
 model.fit_generator(util.generate_arrays_from_file_new(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1, input_shape=(224, 224, 3), random_flip=True),
                     steps_per_epoch=training_labels_center.shape[0] // 32,
                     validation_data=util.generate_arrays_from_file_new(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, input_shape=(224, 224, 3)),
                     validation_steps=validation_labels.shape[0] // 32, epochs=32, verbose=1, callbacks=[history, checkpointer, lrate])
 
 
-model.save('../models/res50_trans_net_test.h5')
+model.save('../models/res50_trans_net_test2.h5')
 print(history.losses)
 
 

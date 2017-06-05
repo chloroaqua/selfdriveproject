@@ -1,9 +1,11 @@
 """
 Creating tensorflow models.
 """
+import random
 from collections import deque
 import logging, os, tempfile
 
+import cv2
 from keras import backend as K
 from keras import metrics
 #from keras.engine.topology import Merge
@@ -276,6 +278,27 @@ class CategoricalModel(BaseModel):
             'thresholds': thresholds,
         }
 '''
+def generate_arrays_from_file_new(labels, index_values, image_path_base, batch_size, scale=1.0, random_flip=False):
+    batch_features = np.zeros((batch_size, 120, 320, 3))
+    batch_labels = np.zeros((batch_size, 1))
+    while True:
+        next_indexes = np.random.choice(np.arange(0, len(index_values)), batch_size)
+        for i, idx in enumerate(next_indexes):
+            #idx = np.random.choice(len(labels), 1)
+            y = labels[idx]
+            image_path = os.path.join(image_path_base, "{}.jpg.npy".format(int(index_values[idx])))
+            image = np.load(image_path)
+            if random_flip:
+                flip_bit = random.randint(0, 1)
+                if flip_bit == 1:
+                    image = np.flip(image, 1)
+                    y = y * -1
+            image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+            image = ((image-(255.0/2))/255.0)
+            batch_features[i, :] = image
+            batch_labels[i] = y * scale
+        yield batch_features, batch_labels
+        #f.close()
 
 class RegressionModel(BaseModel):
     TYPE = 'regression'
@@ -308,6 +331,16 @@ class RegressionModel(BaseModel):
         epoch_size = training_args.get(
             'epoch_size', training_generator.get_size())
 
+        training_dataset_path = "M:\\selfdrive\\SelfDrivingData\\test_out2\\training"
+        training_labels_center = np.load(os.path.join(training_dataset_path, 'training_center_labels.npy'))
+        training_index_center = (np.load(os.path.join(training_dataset_path, 'training_center_indexes.npy')).astype(int))
+        image_base_path_training_center = os.path.join(training_dataset_path, 'images\\center')
+
+        validation_dataset_path = "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation"
+        validation_labels = np.load(os.path.join(validation_dataset_path, 'validation_center_labels.npy'))
+        validation_index_center = (np.load(os.path.join(validation_dataset_path, 'validation_center_indexes.npy')).astype(int))
+        image_base_path_validation = os.path.join(validation_dataset_path, 'images\\center')
+
         #steps_per_epoch = samples_per_epoch / batch_size
         #samples_per_epoch=epoch_size
         #steps_per_epoch= epoch_size/
@@ -316,7 +349,7 @@ class RegressionModel(BaseModel):
             validation_data=validation_generator,
             steps_per_epoch=epoch_size/batch_size,
             validation_steps=validation_size/batch_size,
-            nb_epoch=epochs,
+            epochs=epochs,
             verbose=1,
             )
 
@@ -440,7 +473,7 @@ class RegressionModel(BaseModel):
             'model_uri': model_path,
             'scale': scale,
         }
-
+    #
     # @classmethod
     # def create(cls,
     #            model_path,
@@ -512,62 +545,62 @@ class RegressionModel(BaseModel):
     #         'scale': scale,
     #     }
 
-    @classmethod
-    def create(cls,
-               model_path,
-               input_shape=(120, 320, 3),
-               use_adadelta=True,
-               learning_rate=0.01,
-               W_l2=0.0001,
-               scale=1):
-        """
-        """
-        model = Sequential()
-        model.add(Conv2D(3, (5, 5), strides=2, activation='relu', input_shape=(120, 320, 3)))
-        # model.add(BatchNormalization())
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        print(model.layers[-1].output_shape)
-        model.add(Conv2D(24, (5, 5), strides=2, activation='relu'))
-        model.add(Conv2D(36, (5, 5), strides=2, activation='relu'))
-        # model.add(BatchNormalization())
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        print(model.layers[-1].output_shape)
-        model.add(Conv2D(48, (3, 3), strides=2, activation='relu'))
-        # model.add(BatchNormalization())
-        print(model.layers[-1].output_shape)
-        model.add(Conv2D(64, (3, 3), activation='relu'))
-        # model.add(BatchNormalization())
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        print(model.layers[-1].output_shape)
-        model.add(Conv2D(64, (3, 3), activation='relu'))
-        # model.add(BatchNormalization())
-        print(model.layers[-1].output_shape)
-        model.add(Flatten())
-        model.add(Dense(1164, activation='relu'))
-        # model.add(Dropout(0.2))
-        model.add(Dense(100, activation='relu'))
-        # model.add(Dropout(0.2))
-        model.add(Dense(50, activation='relu'))
-        # model.add(Dropout(0.2))
-        model.add(Dense(10, activation='relu'))
-        model.add(Dense(1))
-        optimizer = ('adadelta' if use_adadelta
-                     else SGD(lr=learning_rate, momentum=0.9))
-
-        model.compile(
-            loss='mean_squared_error',
-            optimizer='rmsprop',
-            metrics=['rmse', rmse])
-
-        # Write model to designated path
-        model.save(model_path)
-
-        # Return model_config params compatible with constructor
-        return {
-            'type': RegressionModel.TYPE,
-            'model_uri': model_path,
-            'scale': scale,
-        }
+    # @classmethod
+    # def create(cls,
+    #            model_path,
+    #            input_shape=(120, 320, 3),
+    #            use_adadelta=True,
+    #            learning_rate=0.01,
+    #            W_l2=0.0001,
+    #            scale=1):
+    #     """
+    #     """
+    #     model = Sequential()
+    #     model.add(Conv2D(3, (5, 5), strides=2, activation='relu', input_shape=(120, 320, 3)))
+    #     # model.add(BatchNormalization())
+    #     # model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     print(model.layers[-1].output_shape)
+    #     model.add(Conv2D(24, (5, 5), strides=2, activation='relu'))
+    #     model.add(Conv2D(36, (5, 5), strides=2, activation='relu'))
+    #     # model.add(BatchNormalization())
+    #     # model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     print(model.layers[-1].output_shape)
+    #     model.add(Conv2D(48, (3, 3), strides=2, activation='relu'))
+    #     # model.add(BatchNormalization())
+    #     print(model.layers[-1].output_shape)
+    #     model.add(Conv2D(64, (3, 3), activation='relu'))
+    #     # model.add(BatchNormalization())
+    #     # model.add(MaxPooling2D(pool_size=(2, 2)))
+    #     print(model.layers[-1].output_shape)
+    #     model.add(Conv2D(64, (3, 3), activation='relu'))
+    #     # model.add(BatchNormalization())
+    #     print(model.layers[-1].output_shape)
+    #     model.add(Flatten())
+    #     model.add(Dense(1164, activation='relu'))
+    #     # model.add(Dropout(0.2))
+    #     model.add(Dense(100, activation='relu'))
+    #     # model.add(Dropout(0.2))
+    #     model.add(Dense(50, activation='relu'))
+    #     # model.add(Dropout(0.2))
+    #     model.add(Dense(10, activation='relu'))
+    #     model.add(Dense(1))
+    #     optimizer = ('adadelta' if use_adadelta
+    #                  else SGD(lr=learning_rate, momentum=0.9))
+    #
+    #     model.compile(
+    #         loss='mean_squared_error',
+    #         optimizer='rmsprop',
+    #         metrics=['rmse', rmse])
+    #
+    #     # Write model to designated path
+    #     model.save(model_path)
+    #
+    #     # Return model_config params compatible with constructor
+    #     return {
+    #         'type': RegressionModel.TYPE,
+    #         'model_uri': model_path,
+    #         'scale': scale,
+    #     }
     '''
     @classmethod
     def create_resnet_inception_v1(cls,
@@ -1039,7 +1072,7 @@ class EnsembleModel(BaseModel):
             'input_model_config': input_model_config,
         }
 
-
+'''
 class LstmModel(BaseModel):
     """
     """
@@ -1448,7 +1481,7 @@ class TransferLstmModel(BaseModel):
             'scale': scale,
             'concat_original': True,
         }
-'''
+
 
 '''
 def inception_layer(model, tower_size):
@@ -1562,22 +1595,22 @@ def no_relu_conv_mxn(n_filters, m, n):
 
     return f
 '''
-'''
+
 MODEL_CLASS_BY_TYPE = {
-    'simple': CategoricalModel,  # backwards compat
-    CategoricalModel.TYPE: CategoricalModel,
-    EnsembleModel.TYPE: EnsembleModel,
+    #'simple': CategoricalModel,  # backwards compat
+    #CategoricalModel.TYPE: CategoricalModel,
+    #EnsembleModel.TYPE: EnsembleModel,
     RegressionModel.TYPE: RegressionModel,
     LstmModel.TYPE: LstmModel,
     TransferLstmModel.TYPE: TransferLstmModel,
-    MixtureModel.TYPE: MixtureModel,
+    #MixtureModel.TYPE: MixtureModel,
 }
-'''
 
-MODEL_CLASS_BY_TYPE = {
-    'simple': RegressionModel,  # backwards compat
-    RegressionModel.TYPE: RegressionModel,
-}
+
+# MODEL_CLASS_BY_TYPE = {
+#     'simple': RegressionModel,  # backwards compat
+#     RegressionModel.TYPE: RegressionModel,
+# }
 
 
 def load_from_config(model_config):

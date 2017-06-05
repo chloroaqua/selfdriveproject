@@ -61,9 +61,9 @@ for i in range(4):
 
 flt = TimeDistributed(Flatten())(cs)
 print(flt._keras_shape)
-lstm1 = LSTM(64, activation='tanh', return_sequences=True)(flt)
+lstm1 = LSTM(64, activation='tanh', return_sequences=True, implementation=2)(flt)
 print(lstm1._keras_shape, "lstm1")
-lstm2 = LSTM(16,  activation='tanh', return_sequences=True)(lstm1)
+lstm2 = LSTM(16,  activation='tanh', return_sequences=True, implementation=2)(lstm1)
 print(lstm2._keras_shape, "lstm2")
 lstm3 = LSTM(16,  activation='tanh')(lstm2)
 dense1 = Dense(512, activation='relu', use_bias=True)(lstm3)
@@ -78,7 +78,7 @@ model = Model(inputs=xin, outputs=angle)
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=[util.rmse])
 
 history = util.LossHistory()
-checkpointer = ModelCheckpoint(filepath="res_net_test_check.hdf5", verbose=1, save_best_only=True)
+checkpointer = ModelCheckpoint(filepath="../models/tmp/res_net_test_check.hdf5", verbose=1, save_best_only=True)
 model.fit_generator(util.generate_arrays_from_file_new_3d(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1, number_of_frames=seq_frames),
                     steps_per_epoch=training_labels_center.shape[0] // 32,
                     validation_data=util.generate_arrays_from_file_new_3d(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames),
