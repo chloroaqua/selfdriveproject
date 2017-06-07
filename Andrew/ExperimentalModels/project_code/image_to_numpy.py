@@ -48,7 +48,44 @@ def make_np_data(input_path, output_path, cam_location, type):
     np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
     np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
 
-    #np.save(os.path.join(output_path, 'labels_{}_{}.npy'.format(type, cam_location)), labels)
+
+
+def make_np_data_test(input_path, output_path, cam_location, type):
+    cam_image_path = os.path.join(input_path, cam_location)
+    images_output_path = os.path.join(output_path, 'images\\{}'.format(cam_location))
+    sensor_csv_path = os.path.join(input_path, 'CH2_final_evaluation.csv')
+    sensor_df = pd.read_csv(sensor_csv_path, dtype=object)
+    # part_dfs = []
+    # center_df = sensor_df[sensor_df['frame_id'] == '{}_camera'.format(cam_location)].copy()
+    # part_dfs.append(center_df[['timestamp', 'filename', 'angle']])
+    master_df = sensor_df.sort_values('frame_id')
+    n_original_samples = len(master_df)
+    labels = np.empty(n_original_samples)
+
+    indexes = np.arange(0, n_original_samples)
+    # np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
+    # np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
+    for image_index, (_, row) in enumerate(master_df.iterrows()):
+        if image_index % 1000 == 0:
+            print(image_index)
+        # print(image_index, row)
+        current_out_filename = os.path.join(images_output_path, '%d.jpg.npy' % image_index)
+        angle = row.steering_angle
+        labels[image_index] = angle
+        current_image = os.path.join(input_path, 'center\\' + str(row.frame_id) + ".jpg")
+        cv_image = cv2.imread(current_image)
+        cv_image = cv2.resize(cv_image, (320, 240))
+        #cv_image = cv2.resize(cv_image, (224, 224))
+        cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
+        cv_image = cv_image[120:240, :, :]
+        # print(current_out_filename)
+        np.save(current_out_filename, cv_image)
+        # plt.imshow(cv_image)
+    np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
+    np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
+
+
+    # np.save(os.path.join(output_path, 'labels_{}_{}.npy'.format(type, cam_location)), labels)
 
 def make_np_data_resnet(input_path, output_path, cam_location, type):
     cam_image_path = os.path.join(input_path, cam_location)
@@ -82,7 +119,10 @@ def make_np_data_resnet(input_path, output_path, cam_location, type):
         labels[image_index] = angle
         current_image = os.path.join(input_path, str(row.filename))
         cv_image = cv2.imread(current_image)
+        #cv_image = cv2.resize(cv_image, (320, 240))
+        #cv_image = cv_image[120:240, :, :]
         cv_image = cv2.resize(cv_image, (224, 224))
+
         cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
         #cv_image = cv_image[120:240, :, :]
         #print(current_out_filename)
@@ -91,13 +131,17 @@ def make_np_data_resnet(input_path, output_path, cam_location, type):
     np.save(os.path.join(output_path, '{}_{}_indexes.npy'.format(type, cam_location)), indexes)
     np.save(os.path.join(output_path, '{}_{}_labels.npy'.format(type, cam_location)), labels)
 
-make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out3\\training", "center", "training")
-make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out3\\validation", "center", "validation")
+#make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out3\\training", "center", "training")
+make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out3\\training", "left", "training")
+make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out3\\training", "right", "training")
+#make_np_data_resnet("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out3\\validation", "center", "validation")
 
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "center", "training")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "left", "training")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", "M:\\selfdrive\\SelfDrivingData\\test_out2\\training", "right", "training")
 
+
+#make_np_data_test("M:\\selfdrive\\SelfDrivingData\\export_ch2_001", "M:\\selfdrive\\SelfDrivingData\\test_out2\\test", "center", "test")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "center", "validation")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "left", "validation")
 #make_np_data("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", "M:\\selfdrive\\SelfDrivingData\\test_out2\\validation", "right", "validation")

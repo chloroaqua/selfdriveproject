@@ -136,6 +136,36 @@ def generate_arrays_from_file_new(labels, index_values, image_path_base, batch_s
         yield batch_features, batch_labels
         #f.close()
 
+def generate_arrays_from_file_new_all_cam(labels, index_values, image_path_base, batch_size, scale=1.0, random_flip=False, input_shape=(120, 320, 3)):
+    batch_features = np.zeros((batch_size, *input_shape))
+    batch_labels = np.zeros((batch_size, 1))
+    while True:
+        cam_id = random.randint(0, 2)
+        if cam_id == 0:
+            next_indexes = np.random.choice(np.arange(0, len(index_values[cam_id])), batch_size)
+        elif cam_id == 1:
+            next_indexes = np.random.choice(np.arange(0, len(index_values[cam_id])), batch_size)
+        elif cam_id == 2:
+            next_indexes = np.random.choice(np.arange(0, len(index_values[cam_id])), batch_size)
+
+
+        for i, idx in enumerate(next_indexes):
+            #idx = np.random.choice(len(labels), 1)
+            y = labels[cam_id][idx]
+            image_path = os.path.join(image_path_base[cam_id], "{}.jpg.npy".format(int(index_values[cam_id][idx])))
+            image = np.load(image_path)
+            if random_flip:
+                flip_bit = random.randint(0, 1)
+                if flip_bit == 1:
+                    image = np.flip(image, 1)
+                    y = y * -1
+            image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
+            image = ((image-(255.0/2))/255.0)
+            batch_features[i, :] = image
+            batch_labels[i] = y * scale
+        yield batch_features, batch_labels
+        #f.close()
+
 
 def generate_arrays_from_file_new_augment(labels, index_values, image_path_base, batch_size, scale=1.0):
     batch_features = np.zeros((batch_size, 120, 320, 3))
@@ -355,7 +385,7 @@ def get_images_seq(start_image_path, number_of_frames, seq_length, start):
     image_copies = np.zeros((1, seq_length, number_of_frames, 120, 320, 3))
     for seq in range(seq_length):
         for i in range(number_of_frames):
-            image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start + i))
+            image_path = os.path.join(start_image_path, '{}.jpg.npy'.format(start + i + seq))
             image = np.load(image_path)
             image = cv2.cvtColor(image, cv2.COLOR_YUV2BGR)
             image = image.astype('uint8')
@@ -363,7 +393,7 @@ def get_images_seq(start_image_path, number_of_frames, seq_length, start):
             image_copies[0, i, :] = image_copy
             image[:, :, 0] = cv2.equalizeHist(image[:, :, 0])
             x = ((image - (255.0 / 2)) / 255.0)
-            data[0, i, :] = x
+            data[0, seq, i, :] = x
 
     return data, image_copies
 

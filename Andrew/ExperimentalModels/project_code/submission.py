@@ -155,17 +155,17 @@ def generate_video(submission_path,
     with open(submission_path) as f:
         for line in f:
             if "frame" not in line:
-                ts, angle = line.strip().split(',')
-                filename_angles.append((ts, angle))
+                ts, angle, true_angle = line.strip().split(',')
+                filename_angles.append((ts, angle, true_angle))
 
     progress_bar = IncrementalBar(
         'Generating overlay',
         max=len(filename_angles),
         suffix='%(percent).1f%% - %(eta)ds')
 
-    for filename, angle in filename_angles:
+    for filename, angle, true_angle in filename_angles:
         img_path = os.path.join(images_path, filename + '.jpg')
-        cv_image = overlay_angle(img_path, float(angle))
+        cv_image = overlay_angle(img_path, float(angle), float(true_angle))
         cv2.imwrite(os.path.join(temp_dir, filename + '.png'), cv_image)
         progress_bar.next()
 
@@ -198,17 +198,26 @@ def generate_video(submission_path,
     print('Wrote final overlay video to', video_path)
 
 
-def overlay_angle(img_path, angle):
+def overlay_angle(img_path, predicted_angle, actual_angle):
     center=(320, 400)
     radius=50
     cv_image = cv2.imread(img_path)
     cv2.circle(cv_image, center, radius, (255, 255, 255), thickness=4, lineType=8)
-    x, y = point_on_circle(center, radius, -angle)
+    x, y = point_on_circle(center, radius, -predicted_angle)
     cv2.circle(cv_image, (x,y), 6, (255, 0, 0), thickness=6, lineType=8)
+    x, y = point_on_circle(center, radius, -actual_angle)
+    cv2.circle(cv_image, (x, y), 8, (0, 255, 0), thickness=6, lineType=8)
     cv2.putText(
         cv_image,
-        'angle: %.5f' % get_degrees(angle),
+        'Predicted: %.5f' % get_degrees(predicted_angle),
         (50, 450),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 255))
+    cv2.putText(
+        cv_image,
+        'Actual: %.5f' % get_degrees(actual_angle),
+        (50, 425),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
         (255, 255, 255))

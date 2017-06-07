@@ -24,7 +24,7 @@ for layer in model.layers:
    layer.trainable = True
 
 
-data, image_copies = util.get_images_single_res("M:\\selfdrive\\SelfDrivingData\\test_out3\\training\\images\\center\\", 10000)
+data, image_copies = util.get_images_single_res("M:\\selfdrive\\SelfDrivingData\\test_out3\\training\\images\\center\\", 1603)
 #data, image_copies = util.get_images_single("M:\\selfdrive\\SelfDrivingData\\test_out2\\training\\images\\center\\", 10000)
 #nvidia 11
 #res 6
@@ -42,7 +42,7 @@ plt.title('Transfer Model')
 plt.axis('off')
 
 
-plt.savefig("transfer.png")
+plt.savefig("transfer_test.png")
 plt.show()
 
 

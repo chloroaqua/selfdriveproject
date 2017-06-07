@@ -49,7 +49,7 @@ num_seqs = 5
 batch_size = 1
 
 #get_images_seq(start_image_path, number_of_frames, seq_length):
-data, image_copies = util.get_images_seq('M:\\selfdrive\\SelfDrivingData\\test_out2\\training\\images\\center\\', seq_frames, num_seqs, 5628)
+data, image_copies = util.get_images_seq('M:\\selfdrive\\SelfDrivingData\\test_out2\\training\\images\\center\\', seq_frames, num_seqs, 10000)
 
 y_pred = model.predict(data)
 print(y_pred)
@@ -72,29 +72,35 @@ layer_dict = dict([(layer.name, layer) for layer in model.layers])
 
 heatmap, grads = visualize_saliency(model, 28, [0], data)
 print(grads.shape)
-grads_new = np.sum(np.abs(grads), axis=(0,1,2))
+#grads_new = np.sum(np.abs(grads), axis=(0,1,2))
+grads_new = np.sum(np.abs(grads), axis=(0))
 grads_new /= np.max(grads_new)
 # heatmap_new = np.uint8(cm.jet(grads_new)[..., :3] * 255)
 # heatmap_new = np.uint8(image_copies[0] * .5 + heatmap_new * (1. - .5))
 heatmap_new = np.uint8(cm.jet(grads_new)[..., :3] * 255)
-heatmap_new = np.uint8(image_copies[0][0][0] * .5 + heatmap_new * (1. - .5))
+#heatmap_new = np.uint8(image_copies[0][0][0] * .5 + heatmap_new * (1. - .5))
+heatmap_new = np.uint8(image_copies[0][0] * .5 + heatmap_new * (1. - .5))
 
 
-print(training_labels_center[10000])
-print(heatmap.shape)
-plt.imshow(heatmap_new)
-plt.axis('off')
-plt.title("3D Convolutional Model with LSTM (Collapsed)")
-plt.show()
-
-# plt.figure(figsize=(12, 6))
-# for i in range(5):
-#     plt.subplot(5, 1, i + 1)
-#     plt.imshow(heatmap_new[0][i])
-#     plt.axis('off')
-#
-# plt.gcf().tight_layout()
+# print(training_labels_center[10000])
+# print(heatmap.shape)
+# plt.imshow(heatmap_new)
+# plt.axis('off')
+# plt.title("3D Convolutional Model with LSTM (Collapsed)")
 # plt.show()
+
+plt.figure(figsize=(12, 6))
+plt.title("3D Convolutional Model With LSTM")
+for i in range(5):
+    plt.subplot(5, 1, i + 1)
+    if i == 0:
+        plt.title("3D Convolutional Model With LSTM")
+    plt.imshow(heatmap_new[0][i])
+    plt.axis('off')
+
+#plt.gcf().tight_layout()
+plt.savefig("3d_full.png")
+plt.show()
 
 
 print("test")

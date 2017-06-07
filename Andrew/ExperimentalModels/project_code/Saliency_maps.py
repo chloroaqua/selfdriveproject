@@ -5,10 +5,10 @@ import numpy as np
 from keras.models import load_model
 from matplotlib import pyplot as plt, cm
 
-from vis.visualization import visualize_saliency
 
 from old import keras_help
 from project_code import util
+from project_code.vis.visualization import visualize_saliency
 
 model = load_model('../nvidia_no_aug_v2.h5', custom_objects={'rmse': keras_help.rmse})
 #model = load_model('../models/res50_trans_net_test.h5', custom_objects={'rmse': keras_help.rmse})
@@ -47,23 +47,23 @@ heatmap_new = np.uint8(cm.jet(grads_new)[..., :3] * 255)
 heatmap_new_large_aug = np.uint8(image_copies[0] * .5 + heatmap_new * (1. - .5))
 
 
-plt.subplot(1, 3, 1)
+plt.subplot(3, 1, 1)
 plt.imshow(heatmap_new_no_aug)
-plt.title('NVIDIA Model No Augmentation')
+plt.title('NVIDIA Model: Minimal Augmentation')
 plt.axis('off')
 
-plt.subplot(1, 3, 2)
+plt.subplot(3, 1, 2)
 plt.imshow(heatmap_new_small_aug)
-plt.title('NVIDIA Model Small Augmentation')
+plt.title('NVIDIA Model: Moderate Augmentation')
 plt.axis('off')
 
-plt.subplot(1, 3, 3)
+plt.subplot(3, 1, 3)
 plt.imshow(heatmap_new_large_aug)
-plt.title('NVIDIA Model Large Augmentation')
+plt.title('NVIDIA Model: Heavy Augmentation')
 plt.axis('off')
 
 
-plt.savefig("nvidia_aug_test.png")
+plt.savefig("nvidia_aug_test_vertical.png")
 plt.show()
 
 
