@@ -16,56 +16,105 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{pomerleau1989alvinn}
 \citation{bojarski2016end}
 \citation{bojarski2016end}
 \citation{bojarski2016end}
+\citation{karpathy2014large}
+\citation{farabet2013learning}
+\citation{szegedy2013deep}
 \citation{Tran_2015_ICCV}
 \citation{yue2015beyond}
 \citation{he2016deep}
 \citation{huang2016densely}
+\citation{santana2016learning}
+\citation{kingma2013auto}
+\citation{goodfellow2014generative}
 \@writefile{toc}{\contentsline {section}{\numberline {1}\hskip -1em.\nobreakspace  {}Introduction}{1}{section.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}\hskip -1em.\nobreakspace  {}Related Work}{1}{section.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces CNN architecture used in \cite  {bojarski2016end}. The network contains approximately 27 million connections and 250 thousand parameters.}}{1}{figure.1}}
-\newlabel{nvidiaimage}{{1}{1}{CNN architecture used in \cite {bojarski2016end}. The network contains approximately 27 million connections and 250 thousand parameters}{figure.1}{}}
-\citation{hochreiter1997long}
-\@writefile{toc}{\contentsline {section}{\numberline {3}\hskip -1em.\nobreakspace  {}Methods}{2}{section.3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Architecture used for team Komanda.}}{2}{figure.2}}
-\newlabel{komanda}{{2}{2}{Architecture used for team Komanda}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Architecture used for team Rambo.}}{2}{figure.3}}
-\newlabel{rambo}{{3}{2}{Architecture used for team Rambo}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}\hskip -1em.\nobreakspace  {}3D Convolutional Model}{2}{subsection.3.1}}
-\citation{Tran_2015_ICCV}
-\citation{bojarski2016end}
-\citation{bojarski2016end}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}\hskip -1em.\nobreakspace  {}Transfer Learning}{3}{subsection.3.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}\hskip -1em.\nobreakspace  {}Potential Methods}{3}{subsection.3.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}\hskip -1em.\nobreakspace  {}Data Preprocessing}{3}{subsection.3.4}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}\hskip -1em.\nobreakspace  {}Dataset and Features}{3}{section.4}}
-\citation{bojarski2016end}
-\@writefile{toc}{\contentsline {section}{\numberline {5}\hskip -1em.\nobreakspace  {}Experiments, Results, and Discussion}{4}{section.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}\hskip -1em.\nobreakspace  {}Data Augmentation}{4}{subsection.5.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces RMSE on the validation set using the NVIDIA architecture for different levels of data augmentation with 32 epochs.}}{4}{table.1}}
-\newlabel{data_aug_table}{{1}{4}{RMSE on the validation set using the NVIDIA architecture for different levels of data augmentation with 32 epochs}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces NVIDIA model saliency maps for different levels of augmentation.}}{4}{figure.4}}
-\newlabel{nvidia_aug}{{4}{4}{NVIDIA model saliency maps for different levels of augmentation}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}\hskip -1em.\nobreakspace  {}Transfer Learning}{4}{subsection.5.2}}
+\citation{el2017deep}
+\citation{shalev2016safe}
+\citation{mnih2013playing}
+\citation{silver2016mastering}
+\citation{el2017deep}
 \citation{he2016deep}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Architecture used for transfer learning model.}}{5}{figure.5}}
-\newlabel{resnet50}{{5}{5}{Architecture used for transfer learning model}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Transfer learning model (ResNet50) saliency map for an example image.}}{5}{figure.6}}
-\newlabel{resnet50_saliency}{{6}{5}{Transfer learning model (ResNet50) saliency map for an example image}{figure.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}\hskip -1em.\nobreakspace  {}New 3D Architecture}{5}{subsection.5.3}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 3D convolutional model with residual connections and recurrent LSTM layers}}{5}{figure.7}}
-\newlabel{3dconvlstm_graph}{{7}{5}{3D convolutional model with residual connections and recurrent LSTM layers}{figure.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces CNN architecture used in \cite  {bojarski2016end}. The network contains approximately 27 million connections and 250 thousand parameters.}}{2}{figure.1}}
+\newlabel{nvidiaimage}{{1}{2}{CNN architecture used in \cite {bojarski2016end}. The network contains approximately 27 million connections and 250 thousand parameters}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}\hskip -1em.\nobreakspace  {}Methods}{2}{section.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}\hskip -1em.\nobreakspace  {}3D Convolutional Model with Residual Connections and Recurrent LSTM Layers}{2}{subsection.3.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}3D Convolutional Layer}{2}{subsubsection.3.1.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Residual Connection}{2}{subsubsection.3.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Spatial Batch Normalization}{2}{subsubsection.3.1.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Recurrent Neural Networks and Long Short Term Memory}{2}{subsubsection.3.1.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}New Architecture}{2}{subsubsection.3.1.5}}
+\citation{bojarski2016end}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 3D convolutional model with residual connections and recurrent LSTM layers}}{3}{figure.2}}
+\newlabel{3dconvlstm_graph}{{2}{3}{3D convolutional model with residual connections and recurrent LSTM layers}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}\hskip -1em.\nobreakspace  {}Transfer Learning}{3}{subsection.3.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Architecture used for transfer learning model.}}{3}{figure.3}}
+\newlabel{resnet50}{{3}{3}{Architecture used for transfer learning model}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}\hskip -1em.\nobreakspace  {}Dataset and Features}{4}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}\hskip -1em.\nobreakspace  {}Data Augmentation Methods}{4}{subsection.4.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Brightness Augmentation}{4}{subsubsection.4.1.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Example images from the dataset. From left to right, bight sun, shadows, sharp left turn, up hill, straight, and heavy traffic conditions.}}{4}{figure.4}}
+\newlabel{example_images}{{4}{4}{Example images from the dataset. From left to right, bight sun, shadows, sharp left turn, up hill, straight, and heavy traffic conditions}{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Brightness augmentation examples}}{4}{figure.5}}
+\newlabel{bright_aug}{{5}{4}{Brightness augmentation examples}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Shadow Augmentation}{4}{subsubsection.4.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Horizontal and Vertical Shifts}{4}{subsubsection.4.1.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}\hskip -1em.\nobreakspace  {}Preprocessing}{4}{subsection.4.2}}
+\citation{bojarski2016end}
+\citation{bojarski2016end}
+\citation{kingma2014adam}
+\citation{kingma2014adam}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Shadow augmentation examples}}{5}{figure.6}}
+\newlabel{shadow_aug}{{6}{5}{Shadow augmentation examples}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Shift augmentation examples}}{5}{figure.7}}
+\newlabel{shift_aug}{{7}{5}{Shift augmentation examples}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}\hskip -1em.\nobreakspace  {}Experiments, Results, and Discussion}{5}{section.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}\hskip -1em.\nobreakspace  {}Data Augmentation}{5}{subsection.5.1}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces RMSE on the validation set using the NVIDIA architecture for different levels of data augmentation with 32 epochs.}}{5}{table.1}}
+\newlabel{data_aug_table}{{1}{5}{RMSE on the validation set using the NVIDIA architecture for different levels of data augmentation with 32 epochs}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}\hskip -1em.\nobreakspace  {}Training Process}{5}{subsection.5.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Loss Function and Optimization}{5}{subsubsection.5.2.1}}
+\newlabel{mse}{{1}{5}{Loss Function and Optimization}{equation.5.1}{}}
+\citation{bojarski2017explaining}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}\hskip -1em.\nobreakspace  {}Feature Visualization}{6}{subsection.5.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Data Augmentation Experiment}{6}{subsubsection.5.3.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces NVIDIA model saliency maps for different levels of augmentation.}}{6}{figure.8}}
+\newlabel{nvidia_aug}{{8}{6}{NVIDIA model saliency maps for different levels of augmentation}{figure.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}3D Convolutional LSTM Model}{6}{subsubsection.5.3.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Saliency map for a sequence in the 3D convolutional LSTM model for an example image.}}{6}{figure.9}}
+\newlabel{3d_full}{{9}{6}{Saliency map for a sequence in the 3D convolutional LSTM model for an example image}{figure.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Saliency map for the 3D convolutional LSTM model for an example image.}}{6}{figure.10}}
+\newlabel{3d_collapse}{{10}{6}{Saliency map for the 3D convolutional LSTM model for an example image}{figure.10}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.3}Transfer Learning Model}{6}{subsubsection.5.3.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Transfer learning model (ResNet50) saliency map for an example image.}}{7}{figure.11}}
+\newlabel{resnet50_saliency}{{11}{7}{Transfer learning model (ResNet50) saliency map for an example image}{figure.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}\hskip -1em.\nobreakspace  {}Results}{7}{subsection.5.4}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces RMSE for the models on the Udacity dataset.}}{7}{table.2}}
+\newlabel{model_results}{{2}{7}{RMSE for the models on the Udacity dataset}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}\hskip -1em.\nobreakspace  {}Discussion}{7}{subsection.5.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Example actual vs. predicted angle on unprocessed images (transfer model).}}{7}{figure.12}}
+\newlabel{angle_overlay}{{12}{7}{Example actual vs. predicted angle on unprocessed images (transfer model)}{figure.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}\hskip -1em.\nobreakspace  {}Conclusion and Future Work}{7}{section.6}}
 \bibstyle{ieee}
 \bibdata{egbib}
 \bibcite{bojarski2016end}{1}
-\bibcite{he2016deep}{2}
-\bibcite{hochreiter1997long}{3}
-\bibcite{huang2016densely}{4}
-\bibcite{Tran_2015_ICCV}{5}
-\bibcite{yue2015beyond}{6}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Saliency map for the 3D convolutional model with residual connections and recurrent LSTM layers for an example image.}}{6}{figure.8}}
-\newlabel{3d_collapse}{{8}{6}{Saliency map for the 3D convolutional model with residual connections and recurrent LSTM layers for an example image}{figure.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}\hskip -1em.\nobreakspace  {}Results}{6}{subsection.5.4}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}\hskip -1em.\nobreakspace  {}Conclusion and Future Work}{6}{section.6}}
+\bibcite{bojarski2017explaining}{2}
+\bibcite{el2017deep}{3}
+\bibcite{farabet2013learning}{4}
+\bibcite{goodfellow2014generative}{5}
+\bibcite{he2016deep}{6}
+\bibcite{huang2016densely}{7}
+\bibcite{karpathy2014large}{8}
+\bibcite{kingma2014adam}{9}
+\bibcite{kingma2013auto}{10}
+\bibcite{mnih2013playing}{11}
+\bibcite{pomerleau1989alvinn}{12}
+\bibcite{santana2016learning}{13}
+\bibcite{shalev2016safe}{14}
+\bibcite{silver2016mastering}{15}
+\bibcite{szegedy2013deep}{16}
+\bibcite{Tran_2015_ICCV}{17}
+\bibcite{yue2015beyond}{18}

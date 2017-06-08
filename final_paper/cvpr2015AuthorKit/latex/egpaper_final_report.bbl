@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}\itemsep=-1pt
+\begin{thebibliography}{10}\itemsep=-1pt
 
 \bibitem{bojarski2016end}
 M.~Bojarski, D.~Del~Testa, D.~Dworakowski, B.~Firner, B.~Flepp, P.~Goyal, L.~D.
@@ -6,21 +6,91 @@ M.~Bojarski, D.~Del~Testa, D.~Dworakowski, B.~Firner, B.~Flepp, P.~Goyal, L.~D.
 \newblock End to end learning for self-driving cars.
 \newblock {\em arXiv preprint arXiv:1604.07316}, 2016.
 
+\bibitem{bojarski2017explaining}
+M.~Bojarski, P.~Yeres, A.~Choromanska, K.~Choromanski, B.~Firner, L.~Jackel,
+  and U.~Muller.
+\newblock Explaining how a deep neural network trained with end-to-end learning
+  steers a car.
+\newblock {\em arXiv preprint arXiv:1704.07911}, 2017.
+
+\bibitem{el2017deep}
+A.~El~Sallab, M.~Abdou, E.~Perot, and S.~Yogamani.
+\newblock Deep reinforcement learning framework for autonomous driving.
+\newblock {\em Autonomous Vehicles and Machines, Electronic Imaging}, 2017.
+
+\bibitem{farabet2013learning}
+C.~Farabet, C.~Couprie, L.~Najman, and Y.~LeCun.
+\newblock Learning hierarchical features for scene labeling.
+\newblock {\em IEEE transactions on pattern analysis and machine intelligence},
+  35(8):1915--1929, 2013.
+
+\bibitem{goodfellow2014generative}
+I.~Goodfellow, J.~Pouget-Abadie, M.~Mirza, B.~Xu, D.~Warde-Farley, S.~Ozair,
+  A.~Courville, and Y.~Bengio.
+\newblock Generative adversarial nets.
+\newblock In {\em Advances in neural information processing systems}, pages
+  2672--2680, 2014.
+
 \bibitem{he2016deep}
 K.~He, X.~Zhang, S.~Ren, and J.~Sun.
 \newblock Deep residual learning for image recognition.
 \newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
   Pattern Recognition}, pages 770--778, 2016.
 
-\bibitem{hochreiter1997long}
-S.~Hochreiter and J.~Schmidhuber.
-\newblock Long short-term memory.
-\newblock {\em Neural computation}, 9(8):1735--1780, 1997.
-
 \bibitem{huang2016densely}
 G.~Huang, Z.~Liu, K.~Q. Weinberger, and L.~van~der Maaten.
 \newblock Densely connected convolutional networks.
 \newblock {\em arXiv preprint arXiv:1608.06993}, 2016.
+
+\bibitem{karpathy2014large}
+A.~Karpathy, G.~Toderici, S.~Shetty, T.~Leung, R.~Sukthankar, and L.~Fei-Fei.
+\newblock Large-scale video classification with convolutional neural networks.
+\newblock In {\em Proceedings of the IEEE conference on Computer Vision and
+  Pattern Recognition}, pages 1725--1732, 2014.
+
+\bibitem{kingma2014adam}
+D.~Kingma and J.~Ba.
+\newblock Adam: A method for stochastic optimization.
+\newblock {\em arXiv preprint arXiv:1412.6980}, 2014.
+
+\bibitem{kingma2013auto}
+D.~P. Kingma and M.~Welling.
+\newblock Auto-encoding variational bayes.
+\newblock {\em arXiv preprint arXiv:1312.6114}, 2013.
+
+\bibitem{mnih2013playing}
+V.~Mnih, K.~Kavukcuoglu, D.~Silver, A.~Graves, I.~Antonoglou, D.~Wierstra, and
+  M.~Riedmiller.
+\newblock Playing atari with deep reinforcement learning.
+\newblock {\em arXiv preprint arXiv:1312.5602}, 2013.
+
+\bibitem{pomerleau1989alvinn}
+D.~A. Pomerleau.
+\newblock Alvinn, an autonomous land vehicle in a neural network.
+\newblock Technical report, Carnegie Mellon University, Computer Science
+  Department, 1989.
+
+\bibitem{santana2016learning}
+E.~Santana and G.~Hotz.
+\newblock Learning a driving simulator.
+\newblock {\em arXiv preprint arXiv:1608.01230}, 2016.
+
+\bibitem{shalev2016safe}
+S.~Shalev-Shwartz, S.~Shammah, and A.~Shashua.
+\newblock Safe, multi-agent, reinforcement learning for autonomous driving.
+\newblock {\em arXiv preprint arXiv:1610.03295}, 2016.
+
+\bibitem{silver2016mastering}
+D.~Silver, A.~Huang, C.~J. Maddison, A.~Guez, L.~Sifre, G.~Van Den~Driessche,
+  J.~Schrittwieser, I.~Antonoglou, V.~Panneershelvam, M.~Lanctot, et~al.
+\newblock Mastering the game of go with deep neural networks and tree search.
+\newblock {\em Nature}, 529(7587):484--489, 2016.
+
+\bibitem{szegedy2013deep}
+C.~Szegedy, A.~Toshev, and D.~Erhan.
+\newblock Deep neural networks for object detection.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  2553--2561, 2013.
 
 \bibitem{Tran_2015_ICCV}
 D.~Tran, L.~Bourdev, R.~Fergus, L.~Torresani, and M.~Paluri.
