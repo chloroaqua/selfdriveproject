@@ -49,21 +49,23 @@ Andrew Simpson\\
 \begin{abstract}
 Self-driving vehicles have expanded dramatically over the last few years. Udacity has release a dataset containing, among other data, a set of images with the steering angle captured during driving. The Udacity challenge aimed to predict steering angle based on only the provided images. 
 
-We explore different models to perform high quality prediction of steering angles based on images using different deep learning techniques including Transfer Learning, 3D CNN, LSTM and ResNet. In addition to predicting steering angle, we also predict auxiliary variables like torque and speed to make the model know better about the driving condition and thus produce precise steering angle predictions.
+We explore two different models to perform high quality prediction of steering angles based on images using different deep learning techniques including Transfer Learning, 3D CNN, LSTM and ResNet. If the Udacity challenge was still ongoing, both of our models would have placed in the top ten of all entries. 
 
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
-Self-driving vehicles are going to be of enormous economic impact over the coming decade. Creating models that meet or exceed the ability of a human driver could save thousands of lives a year. Udacity has an ongoing challenge to create an open source self-driving car. In their second challenge Udacity released a dataset of images taken while driving along with the corresponding steering angle and ancillary sensor data for a training set (left, right, and center cameras with interpolated angles based on camera angle). The goal of the challenge was to find a model that, given an image taken while driving, will minimize the RMSE (root mean square error) between what the model predicts and the actual steering angle produced by a human driver. In this project, we explore a variety of techniques including 3D convolutional neural networks, recurrent neural networks using LSTM, ResNets, etc. to output a predicted steering angle in numerical values.
+Self-driving vehicles are going to be of enormous economic impact over the coming decade. Creating models that meet or exceed the ability of a human driver could save thousands of lives a year. Udacity has an ongoing challenge to create an open source self-driving car \cite{udacity}. In their second challenge Udacity released a dataset of images taken while driving along with the corresponding steering angle and ancillary sensor data for a training set (left, right, and center cameras with interpolated angles based on camera angle). The goal of the challenge was to find a model that, given an image taken while driving, will minimize the RMSE (root mean square error) between what the model predicts and the actual steering angle produced by a human driver. In this project, we explore a variety of techniques including 3D convolutional neural networks, recurrent neural networks using LSTM, ResNets, etc. to output a predicted steering angle in numerical values.
 
 The motivation of the project is to eliminate the need for hand-coding rules and instead create a system that learns how to drive by observing. Predicting steering angle is one important part of the end-to-end approach to self-driving car and would allow us to explore the full power of neural networks. For example, using only steering angle as the training signal, deep neural networks can automatically extract features to help position the road to make the prediction.
+
+The two models that will be discussed are a model that used 3D convolutional layers followed by recurrent layers using LSTM (long short term memory). This model will explore how temporal information is used to predict steering angle. Both 3D convolutional layers and recurrent layers make use of temporal information. The second model to be discussed uses transfer learning (using lower layers of a pre-trained model) by using a high quality model trained on another dataset. Transfer learning helps to mitigate the amount of training data needed to create a high quality model.
 
 
 %-------------------------------------------------------------------------
 \section{Related Work}
 
-Using a neural network for autonomous vehicle navigation was pioneered by Pomerleau (1989) \cite{pomerleau1989alvinn} who built the Autonomous Land Vehicle in a Neural Network (ALVINN) system. The model structure was relatively simple, comprising a fully-connected network which is tiny by today’s standard. The network predicted actions from pixel inputs applied to simple driving scenarios with few obstacles. However, it demonstrated the potential of neural networks for end-to-end autonomous navigation. 
+Using a neural network for autonomous vehicle navigation was pioneered by Pomerleau (1989) \cite{pomerleau1989alvinn} who built the Autonomous Land Vehicle in a Neural Network (ALVINN) system. The model structure was relatively simple, comprising a fully-connected network, which is tiny by today’s standard. The network predicted actions from pixel inputs applied to simple driving scenarios with few obstacles. However, it demonstrated the potential of neural networks for end-to-end autonomous navigation. 
 
 Last year, NVIDIA released a paper regarding a similar idea that benefited from ALVINN.  In the paper \cite{bojarski2016end}, the authors used a relatively basic CNN architecture to extract features from the driving frames. The layout of the architecture can be seen in Figure \ref{nvidiaimage}. Augmentation of the data collected was found to be important. The authors used artificial shifts and rotations of the training set. Left and right cameras with interpolated steering angles were also incorporated. This framework was successful in relatively simple real-world scenarios, such as highway lane-following and driving in flat, obstacle-free courses.  
 
@@ -84,29 +86,28 @@ Moreover, deep reinforcement learning (RL) has also been applied to autonomous d
 
 \section{Methods}
 
-We developed two types of models. The first one uses 3D convolutional layers. Since there is no pretrained 3D convolutional model available, the second one uses 2D pretrained convolutional layers from transfer learning.
-
+We developed two types of models. The first one uses 3D convolutional layers followed by recurrent layers using LSTM. The second model uses transfer learning with 2D convolutional layers on a pre-trained model where the first layers are blocked from training.
 
 
 
 \subsection{3D Convolutional Model with Residual Connections and Recurrent LSTM Layers}
 
 \subsubsection{3D Convolutional Layer}
-How 3D convolutional layer works is similar to 2D conv, the only difference is that in addition to height and width, now we have the third dimension depth (temporal). Instead of having a 2D filter (if we ignore the channel dimension for a while) moving within the image along height and width, now we have a 3D filter moving along with height, width and depth. If the input has shape (D1, H1,  W1, C), then the output would have shape (D2, H2, W2, F) where F is the number of filters. D2, H2, W2 could be calculated given stride and padding in its dimension.
+How 3D convolutional layer works is similar to 2D convolutional layers, the only difference is that in addition to height and width, now we have the third dimension depth (temporal). Instead of having a 2D filter (if we ignore the channel dimension for a while) moving within the image along height and width, now we have a 3D filter moving along with height, width and depth. If the input has shape ($D_1$, $H_1$,  $W_1$, $C$), then the output would have shape ($D_2$, $H_2$, $W_2$, $F$) where $F$ is the number of filters. $D_2$, $H_2$, $W_2$ could be calculated given stride and padding in its dimension.
 
 \subsubsection{Residual Connection}
-Since deep neural network is hard to train, we need residual connections here to help the training process. The idea of residual connection is to use network layers to fit a residual mapping instead of directly trying to fit a desired underlying mapping. 
+Since deep neural networks may have issues passing the gradient through all the layers, residual connections are used to help the training process. The idea of residual connection is to use network layers to fit a residual mapping instead of directly trying to fit a desired underlying mapping. 
 Without residual connection:\\
 Fit $H(G(x))$ directly\\
 With residual connection:\\
 Fit $F(x)=H(G(x))-G(x)-x$\\
-After each 3D convolutional layers, we process its output through a fully connected layer and add it to the output of the whole Visual Feature extraction module.
+Essentially the gradient can skip over different layers. This skipping lowers the effective number of layers the gradient has to pass through in order to make it all the way back. Skipping in this manner alleviates problems with the backpropagation algorithm in very deep networks such as the vanishing gradient problem.
 
 \subsubsection{Spatial Batch Normalization}
-Batch Normalization alleviates a lot of headaches with properly initializing neural networks by explicitly forcing the activations throughout a network to take on a unit gaussian distribution at the beginning of the training. Spatial batch normalization not only normalize among different samples but also among the spatial axis of images. Here we add spatial batch normalization after each 3D convolutional layer.
+Batch Normalization (see \cite{ioffe2015batch}) alleviates a lot of headaches with properly initializing neural networks by explicitly forcing the activations throughout a network to take on a unit gaussian distribution at the beginning of the training. Spatial batch normalization not only normalizes among different samples but also among the spatial axis of images. Here we add spatial batch normalization after each 3D convolutional layer.
 
 \subsubsection{Recurrent Neural Networks and Long Short Term Memory}
-
+Recurrent Neural Networks have loops in them, which allows information to persist. This could be used to understand present frame based on previous video frames. One problem of vanilla RNN is it cannot learn to connect the information too far away due to the gradient vanishing. LSTM has a special cell state, served as a conveyor belt that could allow information to flow without many interactions. After we use 3D convolutional layers to extract visual features, we feed them into LSTM layers to capture the sequential relation.
 
 
 
@@ -122,15 +123,17 @@ For self driving cars, incorporating temporal information could play an importan
 	\label{3dconvlstm_graph}
 \end{figure}
 
-The model consists of a few initial layers to shrink the size followed by ResNet like blocks of 3D convolutions with spatial batch normalization (only two of these in the trained model). Due to computational restraints, shrink layers were added to make the input to the LSTM layers much smaller. Only two levels of recurrent layers were used due to the speed of computation on these layers being much slower due to parts that must be done in a serial manner. The output of the recurrent layers was fed into a fully connected stack that ends with the angle prediction. All of these layers used rectified linear units, ReLUs, as their activation except the LSTM layers. Spatial batch normalization was used on the convolutional layers. The LSTM layers used tanh as their activation.
+The model consists of a few initial layers to shrink the size followed by ResNet like blocks of 3D convolutions with spatial batch normalization (only two of these in the trained model). Due to computational restraints, shrink layers were added to make the input to the LSTM layers much smaller. Only two levels of recurrent layers were used due to the speed of computation on these layers being much slower due to parts that must be done in a serial manner. The output of the recurrent layers was fed into a fully connected stack that ends with the angle prediction. All of these layers used rectified linear units, ReLUs, as their activation except the LSTM layers (ReLUs keep the same positive value as the output and negative values are set to zero). Spatial batch normalization was used on the convolutional layers. The LSTM layers used the hyperbolic tangent function as their activation, which is common to use in these types of layers.
 
 
 \subsection{Transfer Learning}
-For this model, we used transfer learning. Transfer learning is a way of using high quality models that were trained on existing datasets. The idea of transfer learning is that features learned in the lower layers of the model are likely transferable to another dataset. These lower level features would be useful in the new dataset such as edges.
+For this model, we used the idea of transfer learning. Transfer learning is a way of using high quality models that were trained on existing large datasets. The idea of transfer learning is that features learned in the lower layers of the model are likely transferable to another dataset. These lower level features would be useful in the new dataset such as edges.
 
-Of the pre-trained models available, ResNet50 had good performance for this dataset. This model was trained on ImageNet. The weights of the first 15 ResNet blocks were blocked from updating (first 45 individual layers out of 175 total). The output of ResNet50 was connected to a stack of fully connected layers containing 512, 256, 64, and 1 different units respectively. The architecture of this model can be seen in Figure \ref{resnet50} with the overall number of parameters being 24,784,641. The fully connected layers used ReLUs as their activation. The ResNet50 model consists of several different repeating blocks that form residual connections. The sizes of the filters vary from 64 to 512. A block is consistent of a convolutional layer, batch normalization, ReLU activation repeated three times and the input layer output combined with the last layer.
+Of the pre-trained models available, ResNet50 had good performance for this dataset. This model was trained on ImageNet. The weights of the first 15 ResNet blocks were blocked from updating (first 45 individual layers out of 175 total). The output of ResNet50 was connected to a stack of fully connected layers containing 512, 256, 64, and 1 different units respectively. The architecture of this model can be seen in Figure \ref{resnet50} with the overall number of parameters being 24,784,641. The fully connected layers used ReLUs as their activation. The ResNet50 model consists of several different repeating blocks that form residual connections. The number filters varies from 64 to 512. A block is consistent of a convolutional layer, batch normalization, ReLU activation repeated three times and the input layer output combined with the last layer.
 
-Other sizes of locking were attempted, but produced either poor results or were slow in training. For example, training only the last 5 blocks provided poor results, which were only slightly better than predicting a steering angle of zero for all inputs. The model took as input images of 224x224x3. The only augmentation provided for this model was mirrored images. Due to the size constraints of the input into ResNet50, cropping was not used as it involved stretching the image. The filters in the pretrained model were not trained on stretched images, so the filters may not activate as well on the stretched data (RMSE of 0.0891 on the validation set after 32 epochs). Additionally, using the left and the right cameras from the training set proved not to be useful for the 32 epochs used to train (0.17 RMSE on the validation set).
+Other sizes of locking were attempted, but produced either poor results or were slow in training. For example, training only the last 5 blocks provided poor results, which were only slightly better than predicting a steering angle of zero for all inputs. Training all the layers also produced worse results on the validation set compared to blocking the first 45 (0.0870 on the validation set after 32 epochs). 
+
+The model took as input images of 224x224x3 (downsized and mildly stretched from the original Udacity data). The only augmentation provided for this model was mirrored images. Due to the size constraints of the input into ResNet50, cropping was not used as it involved stretching the image. The filters in the pretrained model were not trained on stretched images, so the filters may not activate as well on the stretched data (RMSE of 0.0891 on the validation set after 32 epochs). Additionally, using the left and the right cameras from the training set proved not to be useful for the 32 epochs used to train (0.17 RMSE on the validation set).
 
 \begin{figure}[!htb!]
 	\includegraphics[width=4cm]{resnet50trans.JPG}
@@ -184,10 +187,10 @@ Figure \ref{example_images} shows typical images for different light, traffic an
 \subsection{Data Augmentation Methods}
 
 \subsubsection{Brightness Augmentation}
-We randomly change the brightness to simulate different light conditions. We generate augmented images with different brightness by first converting images to HSV, scaling up or down the V channel and converting back to the RGB channel. Following are typical augmented images.
+Brightness is randomly changed to simulate different light conditions. We generate augmented images with different brightness by first converting images to HSV, scaling up or down the V channel and converting back to the RGB channel. Following are typical augmented images.
 
 \begin{figure}[!htb]
-	\includegraphics[width=8cm]{brightness_aug.JPG}
+	\includegraphics[width=8cm]{brightness_augv2.JPG}
 	\centering
 	\caption{Brightness augmentation examples}
 	\label{bright_aug}
@@ -195,7 +198,7 @@ We randomly change the brightness to simulate different light conditions. We gen
 
 
 \subsubsection{Shadow Augmentation}
-We also cast random shadows across images. The intuition is that even the camera has been shadowed (maybe by rainfall or dust), the model is still expected to predict the correct steering angle. This is implemented by choosing random points and shading all points on one side of the image.
+Random shadows cast across images. The intuition is that even the camera has been shadowed (maybe by rainfall or dust), the model is still expected to predict the correct steering angle. This is implemented by choosing random points and shading all points on one side of the image.
 
 \begin{figure}[!htb]
 	\includegraphics[width=8cm]{shadow_aug.JPG}
@@ -206,7 +209,7 @@ We also cast random shadows across images. The intuition is that even the camera
 
 
 \subsubsection{Horizontal and Vertical Shifts}
-We will shift the camera images horizontally to simulate the effect of car being at different positions on the road, and add an offset corresponding to the shift to the steering angle. We will also shift the images vertically by a random number to simulate the effect of driving up or down the slope.
+We shift the camera images horizontally to simulate the effect of car being at different positions on the road, and add an offset corresponding to the shift to the steering angle. We also shift the images vertically randomly to simulate the effect of driving up or down a slope.
 
 \begin{figure}[!htb]
 	\includegraphics[width=8cm]{shift_aug.JPG}
@@ -215,14 +218,24 @@ We will shift the camera images horizontally to simulate the effect of car being
 	\label{shift_aug}
 \end{figure}
 
+\subsubsection{Rotation Augmentation}
+During the data augmentation experiment, the images were also rotated around the center. The idea behind rotations is that the model should be agnostic to camera orientation and that rotations may help reduce over-fitting.
+
+\begin{figure}[!htb]
+	\includegraphics[width=4cm]{data_aug_rot.JPG}
+	\centering
+	\caption{Rotation augmentation example}
+	\label{rotaion_aug}
+\end{figure}
+
 \subsection{Preprocessing}
-For each image, we normalize the value range from [0, 255] to [-1, 1] by normalizing by image=-1+2*original images/255. We further rescale the image to a 224x224x3 square image for transfer learning model. For the 3D LSTM model we crop the sky out of the image to produce data the size of 120x320x3.
+For each image, we normalize the value range from [0, 255] to [-1, 1] by normalizing by image=-1+2*original images/255. We further rescale the image to a 224x224x3 square image for transfer learning model. For the 3D LSTM model, we cropped the sky out of the image to produce data the size of 120x320x3.
 
 
 \section{Experiments, Results, and Discussion}
 
 \subsection{Data Augmentation}
-In order to establish a baseline for our research, we used the architecture from \cite{bojarski2016end} to test different forms of data augmentation. Teams in the Udacity challenge noted that data augmentation was helpful along with the original NVIDIA researchers. Knowing which forms of augmentation work well for the amount of time and computational available would be helpful in training our new models. The NVIDIA model architecture seen previously in Figure \ref{nvidiaimage}. The input to this model was 120x320x3 with a batch size of 32. In the NVIDIA paper \cite{bojarski2016end} it was not clear how they optimized the loss function. For this experiment, we used the default parameters of Adam (see \cite{kingma2014adam}) provided in Keras (learning rate of 0.001, $\beta_{1}=0.9$, $\beta_{2}=0.999$, $\epsilon=1e-8$, and $decay=0$).
+In order to establish a baseline for our research, we used the architecture from NVIDIA \cite{bojarski2016end} to test different forms of data augmentation. Teams in the Udacity challenge noted that data augmentation was helpful along with the original NVIDIA researchers. Knowing which forms of augmentation work well for the amount of time and computational available would be helpful in training our new models. The NVIDIA model architecture seen previously in Figure \ref{nvidiaimage}. The input to this model was 120x320x3 with a batch size of 32. In the NVIDIA paper \cite{bojarski2016end} it was not clear how they optimized the loss function. For this experiment, we used the default parameters of Adam (see \cite{kingma2014adam}) provided in Keras (learning rate of 0.001, $\beta_{1}=0.9$, $\beta_{2}=0.999$, $\epsilon=1e-8$, and decay=0).
 
 Three different levels of augmentation were examined. The first had minimal augmentation with only using random flips and cropping of the top of the image. Randomly flipping the input images eliminates the bias towards right turns found in the dataset. Cropping the top of the image eliminates the sky from the image, which should not play a role in how to turn predict the steering angle. A second form of augmentation had the same augmentation as the minimal version along with small rotations (-5 to +5 degrees), shifts (25 pixels), and small brightness changes of the image. The final Heavier version of augmentation used more exaggerated effects of the second version including large angle rotations (up to 30 degrees), large shadows, shifts, and larger brightness changes were used. Results from this experiment can be see in Table \ref{data_aug_table}.
 
@@ -257,7 +270,7 @@ RMSE=\sqrt{\frac{1}{n} \sum (y_{i}-\hat{y_{i}})^{2}}
 \end{split}
 \end{equation}
 
-To optimize this loss, the Adam optimizer was used \cite{kingma2014adam}. This optimizers is often the go to choice for deep learning application. This optimization method usually substantially outperforms more generic stochastic gradient decent methods. Initial testing of these models indicate that their loss levels get stuck after a few epochs. The decay rate of the optimizer was updated from 0 to the learning rate divided by the number of epochs. The other default values of the Keras Adam optimizer showed good results during training (learning rate of 0.001, $\beta_{1}=0.9$, $\beta_{2}=0.999$, $\epsilon=1e-8$, and decay=learning rate/batch size).
+To optimize this loss, the Adam optimizer was used \cite{kingma2014adam}. This optimizers is often the go to choice for deep learning application. This optimization method usually substantially outperforms more generic stochastic gradient decent methods. Initial testing of these models indicate that their loss level change slowed after a few epochs. Although Adam computes an adaptive learning rate through its formula, decay of the learning rate was used. The decay rate of the optimizer was updated from 0 to the learning rate divided by the number of epochs. The other default values of the Keras Adam optimizer showed good results during training (learning rate of 0.001, $\beta_{1}=0.9$, $\beta_{2}=0.999$, $\epsilon=1e-8$, and decay=learning rate/batch size).
 
 
 
@@ -311,7 +324,7 @@ An example saliency map for the ResNet50 transfer learning model can be seen in 
 
 
 \subsection{Results}
-These models were all ran on the same datasets. The results for each model is listed in Table \ref{model_results}. The results from the 3D convolutional model with LSTM and residual connections had a RMSE for the test set of 0.1123. Since the Udacity challenge is over, the results can be compared to the leader board. For the 3D LSTM model, the results on the test set would have put in in tenth place overall. The ResNet50 transfer model had the best results overall with a RMSE of 0.0709 on the test set. This result would have placed the model in fourth place overall in the challenge. This is without using any external functions for the models (some teams used an external smoothing function in conjunction with their deep learning models).
+These models were all ran on the same datasets (training, validation, and test). The results for each model is listed in Table \ref{model_results}. The results from the 3D convolutional model with LSTM and residual connections had a RMSE for the test set of 0.1123. Since the Udacity challenge is over, the results can be compared to the leader board. For the 3D LSTM model, the results on the test set would have put in in tenth place overall. The ResNet50 transfer model had the best results overall with a RMSE of 0.0709 on the test set. This result would have placed the model in fourth place overall in the challenge. This is without using any external functions for the models (some teams used an external smoothing function in conjunction with their deep learning models).
 
 
 \begin{table}[!htb]
@@ -340,7 +353,7 @@ In order to help visualization of what this level of error looks like, an exampl
 \subsection{Discussion}
 For the amount of epochs we used, only minimal data augmentation proved to be of any major use for these model. For more expansive training, the strategy of data augmentation can allow for near infinite training data given the right strategy. 
 
-Overall, these models showed that they were competitive with other top models from the Udacity challenge. For the 3D LSTM model, with more time and computational resources, this model could have been expanded to take in a longer period of video along with more ResNet blocks. Expanding the model in this way could have produced superior results. One of the teams near the top of the competition used a full 250 frames or 2.5 seconds of video.
+Overall, these models showed that they were competitive with other top models from the Udacity challenge. For the 3D LSTM model, with more time and computational resources, this model could have been expanded to take in a longer period of video along with more ResNet blocks. Expanding the model in this way could have produced superior results. One of the teams near the top of the competition used a full 250 frames or 2.5 seconds of video \cite{udacity}.
 
 For the Resnet50 transfer model, the strategy of using a pre-trained model, locking approximately the first quarter layers, training the deeper layers with the existing weights, and connecting to a fully connected stack proved to be effective in producing a high quality and competitive model for the Udacity self-driving car dataset. It was surprising that this model outperform the other model. The architecture of this model takes no temporal data, yet it still predicts very good values.
 

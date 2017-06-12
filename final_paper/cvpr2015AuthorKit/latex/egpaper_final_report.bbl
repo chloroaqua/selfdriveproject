@@ -42,6 +42,12 @@ G.~Huang, Z.~Liu, K.~Q. Weinberger, and L.~van~der Maaten.
 \newblock Densely connected convolutional networks.
 \newblock {\em arXiv preprint arXiv:1608.06993}, 2016.
 
+\bibitem{ioffe2015batch}
+S.~Ioffe and C.~Szegedy.
+\newblock Batch normalization: Accelerating deep network training by reducing
+  internal covariate shift.
+\newblock {\em arXiv preprint arXiv:1502.03167}, 2015.
+
 \bibitem{karpathy2014large}
 A.~Karpathy, G.~Toderici, S.~Shetty, T.~Leung, R.~Sukthankar, and L.~Fei-Fei.
 \newblock Large-scale video classification with convolutional neural networks.
@@ -97,6 +103,10 @@ D.~Tran, L.~Bourdev, R.~Fergus, L.~Torresani, and M.~Paluri.
 \newblock Learning spatiotemporal features with 3d convolutional networks.
 \newblock In {\em The IEEE International Conference on Computer Vision (ICCV)},
   December 2015.
+
+\bibitem{udacity}
+Udacity.
+\newblock An open source self-driving car, 2017.
 
 \bibitem{yue2015beyond}
 J.~Yue-Hei~Ng, M.~Hausknecht, S.~Vijayanarasimhan, O.~Vinyals, R.~Monga, and

@@ -127,7 +127,7 @@ print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validat
 model.fit_generator(util.generate_arrays_from_file_new_3d_seq(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
                     steps_per_epoch=10,
                     validation_data=util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
-                    validation_steps=10, epochs=1, verbose=1, callbacks=[history, checkpointer, lrate])
+                    validation_steps=10, epochs=2, verbose=1, callbacks=[history, checkpointer, lrate])
 
 model.save('../models/project_model_3dconv_lstm_best.h5')
 print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 32))

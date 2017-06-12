@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.1)  7 JUN 2017 22:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2015.12.1)  11 JUN 2017 22:04
 entering extended mode
 **egpaper_final_report.tex
 (egpaper_final_report.tex
@@ -351,10 +351,10 @@ Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
 
-<nvidiacnn.jpg, id=6, 214.8025pt x 303.63437pt>
+<nvidiacnn.jpg, id=7, 214.8025pt x 303.63437pt>
 File: nvidiacnn.jpg Graphic file (type jpg)
  <use nvidiacnn.jpg>
-Package pdftex.def Info: nvidiacnn.jpg used on input line 71.
+Package pdftex.def Info: nvidiacnn.jpg used on input line 73.
 (pdftex.def)             Requested size: 170.71652pt x 241.31866pt.
  [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
@@ -363,166 +363,173 @@ Package pdftex.def Info: nvidiacnn.jpg used on input line 71.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
+
+Underfull \vbox (badness 1622) has occurred while \output is active []
+
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 94.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 95.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \hbox (badness 1442) in paragraph at lines 108--108
+Underfull \hbox (badness 1442) in paragraph at lines 109--109
 []\OT1/ptm/b/n/10 Recurrent Neu-ral Net-works and Long Short
  []
 
 [2 <./nvidiacnn.jpg>]
-<3d_lstm_model_architecture.JPG, id=68, 109.91063pt x 280.54813pt>
+<3d_lstm_model_architecture.JPG, id=71, 109.91063pt x 280.54813pt>
 File: 3d_lstm_model_architecture.JPG Graphic file (type jpg)
 
 <use 3d_lstm_model_architecture.JPG>
-Package pdftex.def Info: 3d_lstm_model_architecture.JPG used on input line 119.
+Package pdftex.def Info: 3d_lstm_model_architecture.JPG used on input line 120.
 
 (pdftex.def)             Requested size: 113.81102pt x 290.51315pt.
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 5533) has occurred while \output is active []
 
-
-<resnet50trans.JPG, id=70, 96.86188pt x 110.4125pt>
+ [3 <./3d_lstm_model_architecture.JPG>]
+<resnet50trans.JPG, id=82, 96.86188pt x 110.4125pt>
 File: resnet50trans.JPG Graphic file (type jpg)
  <use resnet50trans.JPG>
-Package pdftex.def Info: resnet50trans.JPG used on input line 136.
+Package pdftex.def Info: resnet50trans.JPG used on input line 139.
 (pdftex.def)             Requested size: 113.81102pt x 129.73468pt.
 
-Underfull \vbox (badness 6332) has occurred while \output is active []
-
- [3 <./3d_lstm_model_architecture.JPG> <./resnet50trans.JPG>]
-Underfull \hbox (badness 10000) in paragraph at lines 153--154
+Underfull \hbox (badness 10000) in paragraph at lines 156--157
 
  []
 
-<sun.jpg, id=80, 642.4pt x 481.8pt>
+<sun.jpg, id=85, 642.4pt x 481.8pt>
 File: sun.jpg Graphic file (type jpg)
  <use sun.jpg>
-Package pdftex.def Info: sun.jpg used on input line 171.
+Package pdftex.def Info: sun.jpg used on input line 174.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<shadow.jpg, id=81, 642.4pt x 481.8pt>
+<shadow.jpg, id=86, 642.4pt x 481.8pt>
 File: shadow.jpg Graphic file (type jpg)
  <use shadow.jpg>
-Package pdftex.def Info: shadow.jpg used on input line 172.
+Package pdftex.def Info: shadow.jpg used on input line 175.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<sharp_left.jpg, id=82, 642.4pt x 481.8pt>
+<sharp_left.jpg, id=87, 642.4pt x 481.8pt>
 File: sharp_left.jpg Graphic file (type jpg)
  <use sharp_left.jpg>
-Package pdftex.def Info: sharp_left.jpg used on input line 173.
+Package pdftex.def Info: sharp_left.jpg used on input line 176.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<uphill.jpg, id=83, 642.4pt x 481.8pt>
+<uphill.jpg, id=88, 642.4pt x 481.8pt>
 File: uphill.jpg Graphic file (type jpg)
  <use uphill.jpg>
-Package pdftex.def Info: uphill.jpg used on input line 174.
+Package pdftex.def Info: uphill.jpg used on input line 177.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<straight.jpg, id=84, 642.4pt x 481.8pt>
+<straight.jpg, id=89, 642.4pt x 481.8pt>
 File: straight.jpg Graphic file (type jpg)
  <use straight.jpg>
-Package pdftex.def Info: straight.jpg used on input line 175.
+Package pdftex.def Info: straight.jpg used on input line 178.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<heavy_trafic.jpg, id=85, 642.4pt x 481.8pt>
+<heavy_trafic.jpg, id=90, 642.4pt x 481.8pt>
 File: heavy_trafic.jpg Graphic file (type jpg)
  <use heavy_trafic.jpg>
-Package pdftex.def Info: heavy_trafic.jpg used on input line 176.
+Package pdftex.def Info: heavy_trafic.jpg used on input line 179.
 (pdftex.def)             Requested size: 49.68864pt x 37.2656pt.
 
-<brightness_aug.JPG, id=86, 252.44313pt x 203.76125pt>
-File: brightness_aug.JPG Graphic file (type jpg)
+<brightness_augv2.JPG, id=91, 258.46562pt x 209.78375pt>
+File: brightness_augv2.JPG Graphic file (type jpg)
 
-<use brightness_aug.JPG>
-Package pdftex.def Info: brightness_aug.JPG used on input line 190.
-(pdftex.def)             Requested size: 227.62204pt x 183.72853pt.
- <shadow_aug.JPG, id=87, 264.48813pt x 209.28188pt>
+<use brightness_augv2.JPG>
+Package pdftex.def Info: brightness_augv2.JPG used on input line 193.
+(pdftex.def)             Requested size: 227.62204pt x 184.75749pt.
+ <shadow_aug.JPG, id=92, 264.48813pt x 209.28188pt>
 File: shadow_aug.JPG Graphic file (type jpg)
 
 <use shadow_aug.JPG>
-Package pdftex.def Info: shadow_aug.JPG used on input line 201.
+Package pdftex.def Info: shadow_aug.JPG used on input line 204.
 (pdftex.def)             Requested size: 227.62204pt x 180.1098pt.
- <shift_aug.JPG, id=88, 263.48438pt x 206.27063pt>
+ [4 <./resnet50trans.JPG> <./sun.jpg> <./shadow.jpg> <./sharp_left.jpg> <./uphi
+ll.jpg> <./straight.jpg> <./heavy_trafic.jpg>]
+<shift_aug.JPG, id=107, 263.48438pt x 206.27063pt>
 File: shift_aug.JPG Graphic file (type jpg)
-
-<use shift_aug.JPG>
-Package pdftex.def Info: shift_aug.JPG used on input line 212.
+ <use shift_aug.JPG>
+Package pdftex.def Info: shift_aug.JPG used on input line 215.
 (pdftex.def)             Requested size: 227.62204pt x 178.20445pt.
- [4 <./sun.jpg> <./shadow.jpg> <./sharp_left.jpg> <./uphill.jpg> <./straight.jp
-g> <./heavy_trafic.jpg> <./brightness_aug.JPG>] [5 <./shadow_aug.JPG> <./shift_
-aug.JPG>]
-<nvidia_aug_test_vert.png, id=131, 460.72125pt x 607.26875pt>
+
+<data_aug_rot.JPG, id=108, 635.87563pt x 241.90375pt>
+File: data_aug_rot.JPG Graphic file (type jpg)
+ <use data_aug_rot.JPG>
+Package pdftex.def Info: data_aug_rot.JPG used on input line 225.
+(pdftex.def)             Requested size: 113.81102pt x 43.29349pt.
+
+[5 <./brightness_augv2.JPG> <./shadow_aug.JPG> <./shift_aug.JPG> <./data_aug_ro
+t.JPG>] <nvidia_aug_test_vert.png, id=132, 460.72125pt x 607.26875pt>
 File: nvidia_aug_test_vert.png Graphic file (type png)
 
 <use nvidia_aug_test_vert.png>
-Package pdftex.def Info: nvidia_aug_test_vert.png used on input line 272.
+Package pdftex.def Info: nvidia_aug_test_vert.png used on input line 285.
 (pdftex.def)             Requested size: 113.81102pt x 150.0099pt.
 
-<3d_lstm_full_title.png, id=133, 256.96pt x 534.49687pt>
+<3d_lstm_full_title.png, id=134, 256.96pt x 534.49687pt>
 File: 3d_lstm_full_title.png Graphic file (type png)
 
 <use 3d_lstm_full_title.png>
-Package pdftex.def Info: 3d_lstm_full_title.png used on input line 284.
+Package pdftex.def Info: 3d_lstm_full_title.png used on input line 297.
 (pdftex.def)             Requested size: 113.81102pt x 236.73709pt.
 
-<3d_full_v2_collapsed.png, id=135, 687.2877pt x 430.0065pt>
+<3d_full_v2_collapsed.png, id=136, 687.2877pt x 430.0065pt>
 File: 3d_full_v2_collapsed.png Graphic file (type png)
 
 <use 3d_full_v2_collapsed.png>
-Package pdftex.def Info: 3d_full_v2_collapsed.png used on input line 293.
+Package pdftex.def Info: 3d_full_v2_collapsed.png used on input line 306.
 (pdftex.def)             Requested size: 227.62204pt x 142.4078pt.
- [6 <./nvidia_aug_test_vert.png> <./3d_lstm_full_title.png> <./3d_full_v2_colla
-psed.png>]
-<resnet50trans_saliency.png, id=152, 462.528pt x 346.896pt>
+
+Underfull \vbox (badness 1655) has occurred while \output is active []
+
+ [6 <./nvidia_aug_test_vert.png>]
+<resnet50trans_saliency.png, id=156, 462.528pt x 346.896pt>
 File: resnet50trans_saliency.png Graphic file (type png)
 
 <use resnet50trans_saliency.png>
-Package pdftex.def Info: resnet50trans_saliency.png used on input line 306.
+Package pdftex.def Info: resnet50trans_saliency.png used on input line 319.
 (pdftex.def)             Requested size: 227.62204pt x 170.71628pt.
 
-<angle_overlay.JPG, id=155, 304.13625pt x 246.42062pt>
+<angle_overlay.JPG, id=159, 304.13625pt x 246.42062pt>
 File: angle_overlay.JPG Graphic file (type jpg)
  <use angle_overlay.JPG>
-Package pdftex.def Info: angle_overlay.JPG used on input line 334.
+Package pdftex.def Info: angle_overlay.JPG used on input line 347.
 (pdftex.def)             Requested size: 227.62204pt x 184.43146pt.
 
-[7 <./resnet50trans_saliency.png> <./angle_overlay.JPG>]
-(egpaper_final_report.bbl
+[7 <./3d_lstm_full_title.png> <./3d_full_v2_collapsed.png> <./resnet50trans_sal
+iency.png>] (egpaper_final_report.bbl
 Underfull \hbox (badness 3492) in paragraph at lines 28--33
 []\OT1/ptm/m/n/9 I. Good-fel-low, J. Pouget-Abadie, M. Mirza, B. Xu,
  []
 
-
-Underfull \hbox (badness 7722) in paragraph at lines 62--66
+[8 <./angle_overlay.JPG>]
+Underfull \hbox (badness 7722) in paragraph at lines 68--72
 []\OT1/ptm/m/n/9 V. Mnih, K. Kavukcuoglu, D. Sil-ver, A. Graves,
  []
 
 
-Underfull \hbox (badness 2368) in paragraph at lines 102--107
+Underfull \hbox (badness 2368) in paragraph at lines 112--117
 []\OT1/ptm/m/n/9 J. Yue-Hei Ng, M. Hausknecht, S. Vi-jaya-narasimhan,
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 364.
- [8]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 364.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 377.
+ [9
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 377.
  (egpaper_final_report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 364.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 364.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 364.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 377.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 377.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 377.
  ) 
 Here is how much of TeX's memory you used:
- 6342 strings out of 493698
- 90739 string characters out of 3144409
- 179990 words of memory out of 3000000
- 9492 multiletter control sequences out of 15000+200000
+ 6355 strings out of 493698
+ 90951 string characters out of 3144409
+ 180110 words of memory out of 3000000
+ 9499 multiletter control sequences out of 15000+200000
  26528 words of font info for 63 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 34i,18n,26p,1110b,324s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 34i,18n,26p,1110b,464s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
 s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/fon
@@ -533,9 +540,9 @@ cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/courier/ucrr8a.pfb><C:/
 Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiK
 TeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/typ
 e1/urw/times/utmri8a.pfb>
-Output written on egpaper_final_report.pdf (8 pages, 1079839 bytes).
+Output written on egpaper_final_report.pdf (9 pages, 1115249 bytes).
 PDF statistics:
- 223 PDF objects out of 1000 (max. 8388607)
- 75 named destinations out of 1000 (max. 500000)
- 86 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 236 PDF objects out of 1000 (max. 8388607)
+ 80 named destinations out of 1000 (max. 500000)
+ 91 words of extra memory for PDF output out of 10000 (max. 10000000)
 

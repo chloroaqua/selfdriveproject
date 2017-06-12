@@ -125,7 +125,7 @@ def load_images_from_file_test_set(input_path, output_file, model, res_size=True
             file.write(str(line[2]))
             file.write('\n')
 
-def load_images_from_file(input_path, output_file, model, cam_location):
+def load_images_from_file(input_path, output_file, model, cam_location, res_size=True):
     sensor_csv_path = os.path.join(input_path, 'interpolated.csv')
     sensor_df = pd.DataFrame.from_csv(sensor_csv_path)
     part_dfs = []
@@ -150,15 +150,27 @@ def load_images_from_file(input_path, output_file, model, cam_location):
         labels[image_index] = angle
         current_image = os.path.join(input_path, str(row.filename))
         cv_image = cv2.imread(current_image)
-        #cv_image = cv2.resize(cv_image, (320, 240))
-        cv_image = cv2.resize(cv_image, (224, 224))
-        cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
-        #cv_image = cv_image[120:240, :, :]
-        cv_image[:, :, 0] = cv2.equalizeHist(cv_image[:, :, 0])
-        image = ((cv_image - (255.0 / 2)) / 255.0)
-        #angle_predict = model.predict(np.reshape(image, (1, 120, 320, 3)))[0][0]
+        if res_size:
+            # cv_image = cv2.resize(cv_image, (320, 240))
+            cv_image = cv2.resize(cv_image, (224, 224))
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
+            # cv_image = cv_image[120:240, :, :]
+            cv_image[:, :, 0] = cv2.equalizeHist(cv_image[:, :, 0])
+            image = ((cv_image - (255.0 / 2)) / 255.0)
+            # angle_predict = model.predict(np.reshape(image, (1, 120, 320, 3)))[0][0]
+            angle_predict = model.predict(np.reshape(image, (1, 224, 224, 3)))[0][0]
+        else:
+            cv_image = cv2.resize(cv_image, (320, 240))
+            #cv_image = cv2.resize(cv_image, (224, 224))
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
+            cv_image = cv_image[120:240, :, :]
+            cv_image[:, :, 0] = cv2.equalizeHist(cv_image[:, :, 0])
+            image = ((cv_image - (255.0 / 2)) / 255.0)
+            angle_predict = model.predict(np.reshape(image, (1, 120, 320, 3)))[0][0]
+
+
         angle = row.angle
-        angle_predict = model.predict(np.reshape(image, (1, 224, 224, 3)))[0][0]
+
         data.append((time_stamp.value, angle_predict, angle))
         #print(time_stamp.value, angle_predict, image_index)
 
@@ -242,9 +254,19 @@ def load_images_from_file_seq(input_path, output_file, model, cam_location, nump
 
 
 
-#model = load_model('../models/res50_trans_net_test3_best.h5', custom_objects={'rmse': util.rmse})
 
+
+#model = load_model('../models/res50_trans_net_test3_best.h5', custom_objects={'rmse': util.rmse})
 #load_images_from_file_test_set('M:\\selfdrive\\SelfDrivingData\\export_ch2_001', 'resnet50tran_best_test.csv', model)
+
+#model = load_model('../nvidia_no_aug_v2.h5', custom_objects={'rmse': util.rmse})
+#load_images_from_file_test_set('M:\\selfdrive\\SelfDrivingData\\export_ch2_001', 'nvidia_no_aug_test.csv', model, res_size=False)
+
+#model = load_model('../nvidia_no_aug_v2.h5', custom_objects={'rmse': util.rmse})
+#load_images_from_file("M:\\selfdrive\\SelfDrivingData\\export_hmb_3", 'nvidia_no_aug_val.csv', model, 'center', res_size=False)
+
+model = load_model('../nvidia_no_aug_v2.h5', custom_objects={'rmse': util.rmse})
+load_images_from_file("M:\\selfdrive\\SelfDrivingData\\export_ch2_002", 'nvidia_no_aug_train.csv', model, 'center', res_size=False)
 
 
 #model = load_model('../models/res50_trans_net_test.h5', custom_objects={'rmse': util.rmse})
@@ -265,5 +287,6 @@ def load_images_from_file_seq(input_path, output_file, model, cam_location, nump
 
 # model = load_model('../nvidia_no_aug_v2.h5', custom_objects={'rmse': util.rmse})
 # load_images_from_file_test_set('M:\\selfdrive\\SelfDrivingData\\export_ch2_001', 'nvidia_no_aug_test.csv', model, res_size=False)
-model = load_model('../models/project_model_3dconv_lstm_best.h5', custom_objects={'rmse': util.rmse})
-plot_model(model, to_file='3dlstmv2.png', show_shapes=True, show_layer_names=False)
+
+#model = load_model('../models/project_model_3dconv_lstm_best.h5', custom_objects={'rmse': util.rmse})
+#plot_model(model, to_file='3dlstmv2.png', show_shapes=True, show_layer_names=False)
