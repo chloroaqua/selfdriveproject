@@ -95,39 +95,13 @@ model.summary()
 history = util.LossHistory()
 lrate = LearningRateScheduler(util.step_decay)
 checkpointer = ModelCheckpoint(filepath="project_model_3dconv_lstm_check_new.hdf5", verbose=1, save_best_only=True)
-# model = Sequential()
-# model.add(TimeDistributed(Conv3D(24, (3, 3, 3), strides=(2, 2, 2), activation='relu', use_bias=True, padding='SAME'), input_shape=(num_seqs, seq_frames, 120, 320, 3)))
-# #model.add(TimeDistributed(Conv2D(24, (5, 5), strides=2, activation='relu'), input_shape=(num_frames, 120, 320, 3)))
-# print(model.layers[-1].output_shape)
-# model.add(BatchNormalization())
-# model.add(TimeDistributed(Conv3D(3, (5, 5, 3), strides=(2, 2, 2), activation='relu', use_bias=True, padding='SAME')))
-# #model.add(TimeDistributed(Conv2D(24, (5, 5), strides=2, activation='relu')))
-# print(model.layers[-1].output_shape)
-# model.add(BatchNormalization())
-# #model.add(Conv3D(128, (3, 3, 3), strides=(2, 2, 2), activation='relu', use_bias=True, padding='SAME', input_shape=(num_frames, 120, 320, 3)))
-# print(model.layers[-1].output_shape)
-# model.add(BatchNormalization())
-# model.add(TimeDistributed(Flatten()))
-# print(model.layers[-1].output_shape)
-# #model.add(LSTM(64, activation='tanh', return_sequences=True))
-# #model.add(LSTM(64, activation='tanh', return_sequences=True))
-# model.add(LSTM(64,  activation='tanh'))
-# print(model.layers[-1].output_shape)
-# model.add(TimeDistributed(Dense(8, activation='relu')))
-# print(model.layers[-1].output_shape)
-# model.add(TimeDistributed(Dense(1)))
-#
-# model.compile(loss='mean_squared_error', optimizer='adam', metrics=[util.rmse])
-#
 
-#training_labels_center.shape[0] // 32
-#validation_labels.shape[0] // 32
-print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 16, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 64))
+print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 64))
 
 model.fit_generator(util.generate_arrays_from_file_new_3d_seq(training_labels_center, training_index_center, image_base_path_training_center, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
-                    steps_per_epoch=10,
+                    steps_per_epoch=training_labels_center.shape[0] // 32,
                     validation_data=util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs),
-                    validation_steps=10, epochs=2, verbose=1, callbacks=[history, checkpointer, lrate])
+                    validation_steps=validation_labels.shape[0] // 32, epochs=2, verbose=1, callbacks=[history, checkpointer, lrate])
 
 model.save('../models/project_model_3dconv_lstm_best.h5')
 print(util.std_evaluate(model, util.generate_arrays_from_file_new_3d_seq(validation_labels, validation_index_center, image_base_path_validation, 32, scale=1, number_of_frames=seq_frames, seq_length=num_seqs), 32))
